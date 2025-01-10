@@ -179,7 +179,6 @@ endingsWithToneChange.forEach(({ pattern, replacement, toneChange }) => {
     return word;
 }
 
-function transformWord(word) {
     // 規則⑤: 特定の母音と子音の組み合わせの変換
     const vowelCombinations = [
         { pattern: /ŭū/g, replacement: 'ŭā' },
