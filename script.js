@@ -138,10 +138,12 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         toneChange = 1;
     }
 
-    // 子音削除: 2つ以上の子音が連続している場合のみ、最後の子音以外を削除
-    const consonantsInMatch = consonant.match(/[^a-zāīȳūēōĭāĭūĭēĭō]+/g); // 連続した子音を取得
-    if (consonantsInMatch && consonantsInMatch.length > 1) {
-        consonant = consonantsInMatch[consonantsInMatch.length - 1]; // 最後の子音のみ残す
+    // 母音リストを使って、非母音文字を取得
+    const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
+    
+    // 2つ以上の子音が連続している場合のみ、最後の子音以外を削除
+    if (nonVowels.length > 1) {
+        consonant = nonVowels[nonVowels.length - 1]; // 最後の子音のみ残す
     }
 
     // 母音p1に音調変更を適用
