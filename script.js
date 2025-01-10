@@ -197,6 +197,9 @@ function transformWord(word) {
         word = word.replace(pattern, replacement);
     });
 
+    return word;  // 関数の戻り値
+}
+
 // HTML要素との連携
 document.addEventListener('DOMContentLoaded', () => {
     const inputField = document.getElementById('input');
