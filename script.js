@@ -80,6 +80,13 @@ function transformWord(word) {
         { pattern: /'/g, replacement: 'R' }
     ];
 
+    patterns.forEach(({ pattern, replacement }) => {
+        word = word.replace(pattern, replacement);
+    });
+
+    // 大文字を小文字に戻し、7と8を置換
+    word = word.toLowerCase().replace(/7/g, "'").replace(/8/g, "’");
+
     // 規則②: 母音間の子音削除
     const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'ā', 'ī', 'ȳ', 'ū', 'ē', 'ō', 'ĭā', 'ĭū', 'ĭē', 'ĭō'];
     const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
@@ -122,19 +129,12 @@ function transformWord(word) {
         { pattern: /ng$/, replacement: 'ng' }
     ];
 
-    patterns.forEach(({ pattern, replacement }) => {
-        word = word.replace(pattern, replacement);
-    });
-
     endings.forEach(({ pattern, replacement }) => {
         word = word.replace(pattern, replacement);
     });
 
     // 最後の変換
     word = word.replace(/Ng/g, 'ng');
-
-    // 大文字を小文字に戻す
-    word = word.toLowerCase();
 
     return word;
 }
