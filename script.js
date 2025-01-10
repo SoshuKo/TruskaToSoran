@@ -116,13 +116,15 @@ function transformWord(word) {
     // 大文字を小文字に戻し、7と8を置換
     word = word.toLowerCase().replace(/7/g, "'").replace(/8/g, "’");
     
-    // 規則②: 母音間の子音削除
-    const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'ā', 'ī', 'ȳ', 'ū', 'ē', 'ō', 'ĭā', 'ĭū', 'ĭē', 'ĭō'];
-    const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
-    word = word.replace(vowelPattern, (match, p1, p2) => `${p1}${p2}`);
+// 規則②: 母音間の子音削除
+const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'ā', 'ī', 'ȳ', 'ū', 'ē', 'ō', 'ĭā', 'ĭū', 'ĭē', 'ĭō'];
+const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
+
+word = word.replace(vowelPattern, (match, p1, p2) => {
     const consonant = match.slice(p1.length, match.length - p2.length);
     let toneChange = 0;
 
+    // 子音に基づく調音変更
     if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
         toneChange = 1;
     } else if (/bŭ|c’|dŭ|gŭ|jŭ|k’|kh|p’|ph|t’|th/.test(consonant)) {
@@ -131,7 +133,10 @@ function transformWord(word) {
         toneChange = 1;
     }
 
+    // 母音p1に音調変更を適用
     p1 = applyToneChange(p1, toneChange);
+
+    // 変換されたp1とその後の母音p2を返す
     return `${p1}${p2}`;
 });
 
