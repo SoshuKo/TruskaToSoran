@@ -1,4 +1,33 @@
 // トルスカ語→ソラン語変換器スクリプト
+function applyToneChange(vowel, toneChange) {
+    const toneMap = {
+        'ĭā': ['ĭâ', 'ĭà'],
+        'ā': ['â', 'à'],
+        'ī': ['î', 'ì'],
+        'ȳ': ['ŷ', 'ỳ'],
+        'ū': ['û', 'ù'],
+        'ĭū': ['ĭû', 'ĭù'],
+        'ĭē': ['ĭê', 'ĭè'],
+        'ē': ['ê', 'è'],
+        'ō': ['ô', 'ò'],
+        'ĭō': ['ĭô', 'ĭò'],
+        'a': ['á', 'ã'],
+        'e': ['é', 'ẽ'],
+        'i': ['í', 'ĩ'],
+        'o': ['ó', 'õ'],
+        'u': ['ú', 'ũ'],
+        'y': ['ý', 'ỹ'],
+        'üa': ['üá', 'üã'],
+        'üā': ['üâ', 'üà'],
+        'üē': ['üê', 'üè'],
+        'üō': ['üô', 'üò']
+    };
+
+    if (toneChange > 0 && toneMap[vowel]) {
+        return toneMap[vowel][toneChange - 1];
+    }
+    return vowel;
+}
 
 function transformWord(word) {
     // 規則①: 各変換パターン
@@ -86,58 +115,82 @@ function transformWord(word) {
 
     // 大文字を小文字に戻し、7と8を置換
     word = word.toLowerCase().replace(/7/g, "'").replace(/8/g, "’");
-
+    
     // 規則②: 母音間の子音削除
     const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'ā', 'ī', 'ȳ', 'ū', 'ē', 'ō', 'ĭā', 'ĭū', 'ĭē', 'ĭō'];
     const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
     word = word.replace(vowelPattern, (match, p1, p2) => `${p1}${p2}`);
+    const consonant = match.slice(p1.length, match.length - p2.length);
+    let toneChange = 0;
+
+    if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
+        toneChange = 1;
+    } else if (/bŭ|c’|dŭ|gŭ|jŭ|k’|kh|p’|ph|t’|th/.test(consonant)) {
+        toneChange = 1;
+    } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
+        toneChange = 1;
+    }
+
+    p1 = applyToneChange(p1, toneChange);
+    return `${p1}${p2}`;
+});
 
     // 規則③: 語尾変換
-    const endings = [
-        { pattern: /'$/, replacement: '' },
-        { pattern: /bŭ$/, replacement: '' },
-        { pattern: /c’$/, replacement: '' },
-        { pattern: /ch’$/, replacement: '' },
-        { pattern: /dŭ$/, replacement: '' },
-        { pattern: /gŭ$/, replacement: '' },
-        { pattern: /jŭ$/, replacement: '' },
-        { pattern: /k’$/, replacement: '' },
-        { pattern: /khŭ$/, replacement: '' },
-        { pattern: /p’$/, replacement: '' },
-        { pattern: /phŭ$/, replacement: '' },
-        { pattern: /rŭ$/, replacement: '' },
-        { pattern: /shŭ$/, replacement: '' },
-        { pattern: /sŭ$/, replacement: '' },
-        { pattern: /t’$/, replacement: '' },
-        { pattern: /thŭ$/, replacement: '' },
-        { pattern: /zŭ$/, replacement: '' },
-        { pattern: /b$/, replacement: '' },
-        { pattern: /c$/, replacement: '' },
-        { pattern: /ch$/, replacement: '' },
-        { pattern: /d$/, replacement: '' },
-        { pattern: /g$/, replacement: '' },
-        { pattern: /j$/, replacement: '' },
-        { pattern: /k$/, replacement: '' },
-        { pattern: /p$/, replacement: '' },
-        { pattern: /ph$/, replacement: '' },
-        { pattern: /s$/, replacement: 'l' },
-        { pattern: /sh$/, replacement: 'l' },
-        { pattern: /t$/, replacement: '' },
-        { pattern: /th$/, replacement: '' },
-        { pattern: /z$/, replacement: 'l' },
-        { pattern: /zŭ$/, replacement: 'l' },
-        { pattern: /ng$/, replacement: 'ng' }
-    ];
+const endingsWithToneChange = [
+    { pattern: /'$/, replacement: '', toneChange: 1 },
+    { pattern: /bŭ$/, replacement: '', toneChange: 2 },
+    { pattern: /c’$/, replacement: '', toneChange: 1 },
+    { pattern: /ch’$/, replacement: '', toneChange: 1 },
+    { pattern: /dŭ$/, replacement: '', toneChange: 2 },
+    { pattern: /gŭ$/, replacement: '', toneChange: 2 },
+    { pattern: /jŭ$/, replacement: '', toneChange: 2 },
+    { pattern: /k’$/, replacement: '', toneChange: 1 },
+    { pattern: /khŭ$/, replacement: '', toneChange: 1 },
+    { pattern: /p’$/, replacement: '', toneChange: 1 },
+    { pattern: /phŭ$/, replacement: '', toneChange: 1 },
+    { pattern: /t’$/, replacement: '', toneChange: 1 },
+    { pattern: /thŭ$/, replacement: '', toneChange: 1 },
+    { pattern: /b$/, replacement: '', toneChange: 2 },
+    { pattern: /c$/, replacement: '', toneChange: 1 },
+    { pattern: /d$/, replacement: '', toneChange: 2 },
+    { pattern: /g$/, replacement: '', toneChange: 2 },
+    { pattern: /j$/, replacement: '', toneChange: 2 },
+    { pattern: /k$/, replacement: '', toneChange: 1 },
+    { pattern: /p$/, replacement: '', toneChange: 1 },
+    { pattern: /t$/, replacement: '', toneChange: 1 }
+];
 
-    endings.forEach(({ pattern, replacement }) => {
-        word = word.replace(pattern, replacement);
-    });
+endingsWithToneChange.forEach(({ pattern, replacement, toneChange }) => {
+    if (pattern.test(word)) {
+        const vowel = word.match(vowels.join('|')).pop();
+        const modifiedVowel = applyToneChange(vowel, toneChange);
+        word = word.replace(vowel, modifiedVowel).replace(pattern, replacement);
+    }
+});
 
     // 最後の変換
     word = word.replace(/Ng/g, 'ng');
 
     return word;
 }
+
+function transformWord(word) {
+    // 規則⑤: 特定の母音と子音の組み合わせの変換
+    const vowelCombinations = [
+        { pattern: /ŭū/g, replacement: 'ŭā' },
+        { pattern: /ŭu/g, replacement: 'ŭa' },
+        { pattern: /ŭĭā/g, replacement: 'üa' },
+        { pattern: /ŭĭū/g, replacement: 'üā' },
+        { pattern: /ŭĭē/g, replacement: 'üē' },
+        { pattern: /ŭĭō/g, replacement: 'üō' },
+        { pattern: /ūŭ/g, replacement: 'āŭ' },
+        { pattern: /ĭūŭ/g, replacement: 'ĭāŭ' },
+        { pattern: /uŭ/g, replacement: 'aŭ' }
+    ];
+
+    vowelCombinations.forEach(({ pattern, replacement }) => {
+        word = word.replace(pattern, replacement);
+    });
 
 // HTML要素との連携
 document.addEventListener('DOMContentLoaded', () => {
