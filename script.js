@@ -138,17 +138,17 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         toneChange = 1;
     }
 
-    // 子音削除: 変換されたp1とその後の母音p2を返す
-    const consonantToRemove = consonant.match(/^[^a-zāīȳūēōĭāĭūĭēĭō]+/); // 子音が存在する場合
-    if (consonantToRemove) {
-        word = word.replace(consonantToRemove[0], ''); // 子音を削除
+    // 子音削除: 2つ以上の子音が連続している場合のみ、最後の子音以外を削除
+    const consonantsInMatch = consonant.match(/[^a-zāīȳūēōĭāĭūĭēĭō]+/g); // 連続した子音を取得
+    if (consonantsInMatch && consonantsInMatch.length > 1) {
+        consonant = consonantsInMatch[consonantsInMatch.length - 1]; // 最後の子音のみ残す
     }
 
     // 母音p1に音調変更を適用
     p1 = applyToneChange(p1, toneChange);
 
     // 変換されたp1とその後の母音p2を返す
-    return `${p1}${p2}`;
+    return `${p1}${consonant}${p2}`;
 });
 
 // 規則③: 語尾変換
