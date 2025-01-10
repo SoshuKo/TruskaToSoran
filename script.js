@@ -1,4 +1,8 @@
 // トルスカ語→ソラン語変換器スクリプト
+function convertSentence(sentence) {
+    return sentence.split(/\s+/).map(transformWord).join(' ');
+}
+
 function applyToneChange(vowel, toneChange) {
     const toneMap = {
         'ĭā': ['ĭâ', 'ĭà'],
