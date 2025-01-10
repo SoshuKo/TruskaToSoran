@@ -126,7 +126,7 @@ const consonants = [
 const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
 
 word = word.replace(vowelPattern, (match, p1, p2) => {
-    const consonant = match.slice(p1.length, match.length - p2.length); // 中間の子音部分を抽出
+    let consonant = match.slice(p1.length, match.length - p2.length); // 変更: const → let
     let toneChange = 0;
 
     // 子音に基づく調音変更
