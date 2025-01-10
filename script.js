@@ -201,6 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     convertButton.addEventListener('click', () => {
         const inputText = inputField.value;
         const outputText = transformWord(inputText);
-        outputField.textContent = outputText;
+        outputField.value = outputText;  // textContent → value に修正
     });
 });
