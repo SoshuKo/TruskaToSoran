@@ -1,4 +1,5 @@
-// トルスカ語→ソラン語変換器スクリプト
+const vowels = ["ĭā", "ā", "ī", "ȳ", "ū", "ĭū", "ĭē", "ē", "ō", "ĭō", "a", "e", "i", "o", "u", "y", "üa", "üā", "üē", "üō"];
+
 function convertSentence(sentence) {
     return sentence.split(/\s+/).map(transformWord).join(' ');
 }
