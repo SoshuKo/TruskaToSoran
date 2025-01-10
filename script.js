@@ -144,6 +144,9 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
     // 2つ以上の子音が連続している場合のみ、最後の子音以外を削除
     if (nonVowels.length > 1) {
         consonant = nonVowels[nonVowels.length - 1]; // 最後の子音のみ残す
+    } else if (nonVowels.length === 1 && /kh|ph|sh|th/.test(nonVowels[0])) {
+        // 子音が1つ（kh, ph, sh, th）の場合は、音調変更をしない
+        toneChange = 0;
     }
 
     // 母音p1に音調変更を適用
