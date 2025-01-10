@@ -121,20 +121,20 @@ function transformWord(word) {
     word = word.toLowerCase().replace(/7/g, "'").replace(/8/g, "’");
     
 // 規則②: 母音間の子音削除
-const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'ā', 'ī', 'ȳ', 'ū', 'ē', 'ō', 'ĭā', 'ĭū', 'ĭē', 'ĭō'];
 const consonants = [
     "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng", 
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r", 
     "s", "t", "v", "w", "x", "z"
 ];
+
 const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
 
 word = word.replace(vowelPattern, (match, p1, p2) => {
-    let consonant = match.slice(p1.length, match.length - p2.length); // 変更: const → let
+    let consonant = match.slice(p1.length, match.length - p2.length);
     let toneChange = 0;
 
-    // 子音に基づく調音変更
-    if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
+    // 2文字子音の処理: kh, ph, sh, th は削除せずそのまま残す
+    if (/ch’|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
         toneChange = 1;
     } else if (/bŭ|c’|dŭ|gŭ|jŭ|k’|kh|p’|ph|t’|th/.test(consonant)) {
         toneChange = 2;
@@ -144,13 +144,14 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
 
     // 母音リストを使って、非母音文字を取得
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
-    
+
     // 2つ以上の子音が連続している場合のみ、最後の子音以外を削除
-    if (nonVowels.length > 1) {
+    if (nonVowels.length > 1 && !/kh|ph|sh|th/.test(nonVowels.join(''))) {
         consonant = nonVowels[nonVowels.length - 1]; // 最後の子音のみ残す
-    } else if (nonVowels.length === 1 && /kh|ph|sh|th/.test(nonVowels[0])) {
-        // 子音が1つ（kh, ph, sh, th）の場合は、音調変更をしない
-        toneChange = 0;
+    } else if (nonVowels.length === 1 && /ch|kh|ph|sh|th/.test(nonVowels[0])) {
+        // ch, kh, ph, sh, thの処理
+        consonant = nonVowels.join('');
+        toneChange = 0;  // 追加: これらの子音は音調変更しない
     }
 
     // 母音p1に音調変更を適用
