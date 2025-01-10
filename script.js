@@ -173,12 +173,6 @@ endingsWithToneChange.forEach(({ pattern, replacement, toneChange }) => {
     }
 });
 
-    // 最後の変換
-    word = word.replace(/Ng/g, 'ng');
-
-    return word;
-}
-
     // 規則⑤: 特定の母音と子音の組み合わせの変換
     const vowelCombinations = [
         { pattern: /ŭū/g, replacement: 'ŭā' },
@@ -196,6 +190,9 @@ endingsWithToneChange.forEach(({ pattern, replacement, toneChange }) => {
         word = word.replace(pattern, replacement);
     });
 
+    // 最後の変換
+    word = word.replace(/Ng/g, 'ng');
+    
     return word;  // 関数の戻り値
 }
 
