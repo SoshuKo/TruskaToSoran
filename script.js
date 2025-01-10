@@ -118,19 +118,30 @@ function transformWord(word) {
     
 // 規則②: 母音間の子音削除
 const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'ā', 'ī', 'ȳ', 'ū', 'ē', 'ō', 'ĭā', 'ĭū', 'ĭē', 'ĭō'];
+const consonants = [
+    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng", 
+    "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r", 
+    "s", "t", "v", "w", "x", "z"
+];
 const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
 
 word = word.replace(vowelPattern, (match, p1, p2) => {
-    const consonant = match.slice(p1.length, match.length - p2.length);
+    const consonant = match.slice(p1.length, match.length - p2.length); // 中間の子音部分を抽出
     let toneChange = 0;
 
     // 子音に基づく調音変更
     if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
         toneChange = 1;
     } else if (/bŭ|c’|dŭ|gŭ|jŭ|k’|kh|p’|ph|t’|th/.test(consonant)) {
-        toneChange = 1;
+        toneChange = 2;
     } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
         toneChange = 1;
+    }
+
+    // 子音削除: 変換されたp1とその後の母音p2を返す
+    const consonantToRemove = consonant.match(/^[^a-zāīȳūēōĭāĭūĭēĭō]+/); // 子音が存在する場合
+    if (consonantToRemove) {
+        word = word.replace(consonantToRemove[0], ''); // 子音を削除
     }
 
     // 母音p1に音調変更を適用
@@ -140,39 +151,62 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
     return `${p1}${p2}`;
 });
 
-    // 規則③: 語尾変換
+// 規則③: 語尾変換
 const endingsWithToneChange = [
-    { pattern: /'$/, replacement: '', toneChange: 1 },
-    { pattern: /bŭ$/, replacement: '', toneChange: 2 },
-    { pattern: /c’$/, replacement: '', toneChange: 1 },
-    { pattern: /ch’$/, replacement: '', toneChange: 1 },
-    { pattern: /dŭ$/, replacement: '', toneChange: 2 },
-    { pattern: /gŭ$/, replacement: '', toneChange: 2 },
-    { pattern: /jŭ$/, replacement: '', toneChange: 2 },
-    { pattern: /k’$/, replacement: '', toneChange: 1 },
-    { pattern: /khŭ$/, replacement: '', toneChange: 1 },
-    { pattern: /p’$/, replacement: '', toneChange: 1 },
-    { pattern: /phŭ$/, replacement: '', toneChange: 1 },
-    { pattern: /t’$/, replacement: '', toneChange: 1 },
-    { pattern: /thŭ$/, replacement: '', toneChange: 1 },
-    { pattern: /b$/, replacement: '', toneChange: 2 },
-    { pattern: /c$/, replacement: '', toneChange: 1 },
-    { pattern: /d$/, replacement: '', toneChange: 2 },
-    { pattern: /g$/, replacement: '', toneChange: 2 },
-    { pattern: /j$/, replacement: '', toneChange: 2 },
-    { pattern: /k$/, replacement: '', toneChange: 1 },
-    { pattern: /p$/, replacement: '', toneChange: 1 },
-    { pattern: /t$/, replacement: '', toneChange: 1 }
+    { pattern: /'$/, replacement: '', toneChange: 1 },  // ' → 子音なし (声調変化1)
+    { pattern: /b$/, replacement: '', toneChange: 2 },  // b → 子音なし (声調変化2)
+    { pattern: /bŭ$/, replacement: '', toneChange: 2 },  // bŭ → 子音なし (声調変化2)
+    { pattern: /c$/, replacement: '', toneChange: 1 },  // c → 子音なし (声調変化1)
+    { pattern: /c’$/, replacement: '', toneChange: 1 },  // c’ → 子音なし (声調変化1)
+    { pattern: /ch$/, replacement: '', toneChange: 1 },  // ch → 子音なし (声調変化1)
+    { pattern: /ch’$/, replacement: '', toneChange: 1 },  // ch’ → 子音なし (声調変化1)
+    { pattern: /d$/, replacement: '', toneChange: 2 },  // d → 子音なし (声調変化2)
+    { pattern: /dŭ$/, replacement: '', toneChange: 2 },  // dŭ → 子音なし (声調変化2)
+    { pattern: /f$/, replacement: 'm', toneChange: 0 },  // f → m
+    { pattern: /g$/, replacement: '', toneChange: 2 },  // g → 子音なし (声調変化2)
+    { pattern: /gh$/, replacement: 'Ng', toneChange: 0 },  // gh → Ng
+    { pattern: /ghŭ$/, replacement: 'Ng', toneChange: 0 },  // ghŭ → Ng
+    { pattern: /gŭ$/, replacement: '', toneChange: 2 },  // gŭ → 子音なし (声調変化2)
+    { pattern: /j$/, replacement: '', toneChange: 2 },  // j → 子音なし (声調変化2)
+    { pattern: /jŭ$/, replacement: '', toneChange: 2 },  // jŭ → 子音なし (声調変化2)
+    { pattern: /k$/, replacement: '', toneChange: 1 },  // k → 子音なし (声調変化1)
+    { pattern: /k’$/, replacement: '', toneChange: 1 },  // k’ → 子音なし (声調変化1)
+    { pattern: /kh$/, replacement: '', toneChange: 1 },  // kh → 子音なし (声調変化1)
+    { pattern: /khŭ$/, replacement: '', toneChange: 1 },  // khŭ → 子音なし (声調変化1)
+    { pattern: /m$/, replacement: 'n', toneChange: 0 },  // m → n
+    { pattern: /ng$/, replacement: 'Ng', toneChange: 0 },  // ng → Ng
+    { pattern: /n$/, replacement: 'n', toneChange: 0 },  // n → n
+    { pattern: /p$/, replacement: '', toneChange: 1 },  // p → 子音なし (声調変化1)
+    { pattern: /p’$/, replacement: '', toneChange: 1 },  // p’ → 子音なし (声調変化1)
+    { pattern: /ph$/, replacement: '', toneChange: 1 },  // ph → 子音なし (声調変化1)
+    { pattern: /phŭ$/, replacement: '', toneChange: 1 },  // phŭ → 子音なし (声調変化1)
+    { pattern: /r$/, replacement: 'l', toneChange: 0 },  // r → l
+    { pattern: /rŭ$/, replacement: 'l', toneChange: 0 },  // rŭ → l
+    { pattern: /s$/, replacement: 'l', toneChange: 0 },  // s → l
+    { pattern: /sh$/, replacement: 'l', toneChange: 0 },  // sh → l
+    { pattern: /shŭ$/, replacement: 'l', toneChange: 0 },  // shŭ → l
+    { pattern: /sŭ$/, replacement: 'l', toneChange: 0 },  // sŭ → l
+    { pattern: /t$/, replacement: '', toneChange: 1 },  // t → 子音なし (声調変化1)
+    { pattern: /t’$/, replacement: '', toneChange: 1 },  // t’ → 子音なし (声調変化1)
+    { pattern: /th$/, replacement: '', toneChange: 1 },  // th → 子音なし (声調変化1)
+    { pattern: /thŭ$/, replacement: '', toneChange: 1 },  // thŭ → 子音なし (声調変化1)
+    { pattern: /v$/, replacement: 'm', toneChange: 0 },  // v → m
+    { pattern: /w$/, replacement: 'ŭ', toneChange: 0 },  // w → ŭ
+    { pattern: /x$/, replacement: 'ng', toneChange: 0 },  // x → ng
+    { pattern: /z$/, replacement: 'l', toneChange: 0 },  // z → l
+    { pattern: /zŭ$/, replacement: 'l', toneChange: 0 }  // zŭ → l
 ];
 
 endingsWithToneChange.forEach(({ pattern, replacement, toneChange }) => {
     if (pattern.test(word)) {
-        const vowel = word.match(vowels.join('|')).pop();
+        // 語尾の子音に基づいて音調変更を適用
+        const vowel = word.match(vowels.join('|')).pop(); // 母音を取得
         const modifiedVowel = applyToneChange(vowel, toneChange);
         word = word.replace(vowel, modifiedVowel).replace(pattern, replacement);
     }
 });
 
+    
     // 規則⑤: 特定の母音と子音の組み合わせの変換
     const vowelCombinations = [
         { pattern: /ŭū/g, replacement: 'ŭā' },
