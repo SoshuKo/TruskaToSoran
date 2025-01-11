@@ -148,7 +148,7 @@ const consonants = [
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-const vowelPattern = new RegExp((${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')}), 'g');
+const vowelPattern = new RegExp(`(<span class="math-inline">\{vowels\.join\('\|'\)\}\)\[^</span>{vowels.join('')}]+(${vowels.join('|')})`, 'g'); // 正しい例
 
 word = word.replace(vowelPattern, (match, p1, p2) => {
     let consonant = match.slice(p1.length, match.length - p2.length);
