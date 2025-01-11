@@ -148,53 +148,48 @@ const consonants = [
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`, 'g');
+const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]*?)([${consonants.join('')}]*?)([^${vowels.join('')}]*?)(?=${vowels.join('|')})`, 'g'); // キャプチャグループを追加
 
-word = word.replace(vowelPattern, (match, p1, consonant, p2) => {
-    let modifiedConsonant = consonant;
+word = word.replace(vowelPattern, (match, p1, preConsonants, consonant, postConsonants) => {
     let toneChange = 0;
     let shouldApplyToneChange = false;
 
+    // 子音部分をさらに分解して、削除処理前の状態を保持
+    const originalConsonant = consonant;
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
+    
+    // 音調変化のルール
+    if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
+        toneChange = 1;
+    } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
+        toneChange = 2;
+    } else if (/ghŭ|gh|ng|rŭ|sŭ|shŭ|zŭ/.test(consonant)) {
+        toneChange = 0;
+    } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
+        toneChange = 1;
+    } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
+        toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
+    }
 
-    if (nonVowels.length > 0) { // 子音が存在する場合のみ処理を行う
+    // 子音削除処理
+    if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
+        consonant = nonVowels.slice(-3).join('');
+    } else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
+        consonant = nonVowels.slice(-2).join('');
+    } else if (nonVowels.length >= 1) {
+        consonant = nonVowels[nonVowels.length - 1];
+    }
 
-        // 音調変化のルール
-        if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
-            toneChange = 1;
-        } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
-            toneChange = 2;
-        } else if (/ghŭ|gh|ng|rŭ|sŭ|shŭ|zŭ/.test(consonant)) {
-            toneChange = 0;
-        } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
-            toneChange = 1;
-        } else if (/b|d|g|j/.test(consonant)) {
-            toneChange = 2;
-        } else if (/'|c|k|p|t/.test(consonant)) {
-            toneChange = 1;
-        }
-
-        const originalNonVowelsLength = nonVowels.length
-
-        // 子音削除処理
-        if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
-            modifiedConsonant = nonVowels.slice(-3).join('');
-        } else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
-            modifiedConsonant = nonVowels.slice(-2).join('');
-        } else if (nonVowels.length >= 1) {
-            modifiedConsonant = nonVowels[nonVowels.length - 1];
-        }
-
-        if (originalNonVowelsLength > modifiedConsonant.length) {
-          shouldApplyToneChange = true;
-        }
+    // 子音の削除が行われたかどうかの判定 (キャプチャグループの比較)
+    if (originalConsonant !== consonant) {
+        shouldApplyToneChange = true;
     }
 
     if (shouldApplyToneChange) {
         p1 = applyToneChange(p1, toneChange);
     }
 
-    return `${p1}${modifiedConsonant}${p2}`;
+    return `${p1}${preConsonants}${consonant}${postConsonants}`;
 });
     
 // 規則③: 語尾変換
@@ -252,7 +247,6 @@ endingsWithToneChange.forEach(({ pattern, replacement, toneChange }) => {
     }
 });
 
-    
     // 規則⑤: 特定の母音と子音の組み合わせの変換
     const vowelCombinations = [
         { pattern: /ŭū/g, replacement: 'ŭā' },
