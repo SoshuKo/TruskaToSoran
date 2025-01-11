@@ -197,22 +197,15 @@ function transformWord(word) {
 
     word = modifiedWord;
 
-// 規則A: 残った子音連続を最後の子音を残して削除
-
 const allConsonants = [
     "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-const toneChangeConsonants1 = ["ch’", "khŭ", "phŭ", "thŭ", "ch", "c’", "k’", "p’", "t’", "kh", "ph", "th", "'", "c", "k", "p", "t"];
-const toneChangeConsonants2 = ["bŭ", "dŭ", "gŭ", "jŭ", "b", "d", "g", "j"];
-
-word = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonants.join('|')})+`, 'g'), (match, p1, matchConsonants) => {
+word = word.replace(new RegExp(`(${allConsonants.join('|')})+`, 'g'), (match) => {
     let lastConsonant = "";
-    let tempMatch = matchConsonants;
-    let firstRemovedConsonant = "";
-    let toneChange = 0;
+    let tempMatch = match;
 
     for (const consonant of allConsonants) {
         if (tempMatch.endsWith(consonant)) {
@@ -220,45 +213,22 @@ word = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonants.join('|')}
             break;
         }
     }
-    if (lastConsonant === "’" && matchConsonants.length > 1 && matchConsonants.at(-2) === 'h') {
-        lastConsonant = matchConsonants.at(-3) + 'h’'
-    } else if (lastConsonant === "ŭ" && matchConsonants.length > 1 && matchConsonants.at(-2) === 'h') {
-        lastConsonant = matchConsonants.at(-3) + 'hŭ'
-    } else if (lastConsonant === "’" && matchConsonants.length > 1) {
-        lastConsonant = matchConsonants.at(-2) + '’';
-    } else if (lastConsonant === "ŭ" && matchConsonants.length > 1) {
-        lastConsonant = matchConsonants.at(-2) + 'ŭ';
-    } else if (lastConsonant === "g" && matchConsonants.length > 1 && matchConsonants.at(-2) === 'n'){
+    if (lastConsonant === "’" && match.length > 1 && match.at(-2) === 'h') {
+        lastConsonant = match.at(-3) + 'h’'
+    } else if (lastConsonant === "ŭ" && match.length > 1 && match.at(-2) === 'h') {
+        lastConsonant = match.at(-3) + 'hŭ'
+    } else if (lastConsonant === "’" && match.length > 1) {
+        lastConsonant = match.at(-2) + '’';
+    } else if (lastConsonant === "ŭ" && match.length > 1) {
+        lastConsonant = match.at(-2) + 'ŭ';
+    } else if (lastConsonant === "g" && match.length > 1 && match.at(-2) === 'n'){
         lastConsonant = 'ng';
     } else if (lastConsonant !== ""){
         
     } else {
-        return p1;
+        return "";
     }
-    firstRemovedConsonant = matchConsonants.replace(new RegExp(lastConsonant + '$'), '');
-    if(firstRemovedConsonant !== ""){
-        for (const consonant of allConsonants) {
-            if (firstRemovedConsonant.startsWith(consonant)) {
-                firstRemovedConsonant = consonant;
-                break;
-            }
-        }
-    } else {
-        return p1 + lastConsonant;//削除する子音が無ければそのまま返す
-    }
-
-    // ★ 声調変化を適用する位置を移動
-    if (toneChangeConsonants1.includes(firstRemovedConsonant)) {
-        toneChange = 1;
-    } else if (toneChangeConsonants2.includes(firstRemovedConsonant)) {
-        toneChange = 2;
-    }
-
-    if (toneChange !== 0) {
-        p1 = applyToneChange(p1, toneChange);
-    }
-
-    return p1 + lastConsonant;
+    return lastConsonant;
 });
     
 // 規則③: 語尾変換
