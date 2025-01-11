@@ -148,7 +148,7 @@ const consonants = [
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
+const vowelPattern = new RegExp((${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')}), 'g');
 
 word = word.replace(vowelPattern, (match, p1, p2) => {
     let consonant = match.slice(p1.length, match.length - p2.length);
@@ -185,17 +185,12 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         consonant = nonVowels[nonVowels.length - 1]; // 最後の一文字のみ残す
     }
 
-    // D: 子音連続の最後の子音以外の子音は全て削除
-    if (nonVowels.length > 1 && !/ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ|c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|gh|ng|ph|sh|th/.test(consonant)) {
-        consonant = ''; // 他の子音を削除
-    }
-
-    // E: 子音連続によって三文字子音、二文字子音が削除される際の声調変化を有効にする
-    if (shouldApplyToneChange && nonVowels.length > 1 && consonant !== '') {
+    // 子音削除が行われた場合のみ音調変更を適用
+    if (shouldApplyToneChange && nonVowels.length > 1) {
         p1 = applyToneChange(p1, toneChange);
     }
 
-    return `${p1}${consonant}${p2}`;
+    return ${p1}${consonant}${p2};
 });
     
 // 規則③: 語尾変換
