@@ -142,67 +142,61 @@ function transformWord(word) {
     word = word.toLowerCase().replace(/7/g, "'").replace(/8/g, "’");
     
 // 規則②: 母音間の子音削除
+const vowels = ["ĭā", "ā", "ī", "ȳ", "ū", "ĭū", "ĭē", "ē", "ō", "ĭō", "a", "e", "i", "o", "u", "y", "üa", "üā", "üē", "üō", "ĭâ", "ĭà", "â", "à", "î", "ì", "ŷ", "ỳ", "û", "ù", "ĭû", "ĭù", "ĭê", "ĭè", "ê", "è", "ô", "ò", "ĭô", "ĭò", "á", "ã", "é", "ẽ", "í", "ĩ", "ó", "õ", "ú", "ũ", "ý", "ỹ"];
 const consonants = [
     "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-    // ★ 修正箇所1: グローバルフラグ /g を削除
-    const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`);
+const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`);
 
-    let modifiedWord = word;
-    let iterations = 0;
-    const maxIterations = 10;
-    
-    // ★ 修正箇所2: do...while ループは1つのみ
-    do {
-        word = modifiedWord;
-        modifiedWord = word.replace(vowelPattern, (match, p1, consonant, p2) => {
-            let toneChange = 0;
-            let shouldApplyToneChange = false;
+let modifiedWord = word;
+let iterations = 0;
+const maxIterations = 10;
 
-            const originalConsonant = consonant;
-            const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
+do {
+    word = modifiedWord;
+    modifiedWord = word.replace(vowelPattern, (match, p1, consonant, p2) => {
+        let toneChange = 0;
+        let shouldApplyToneChange = false;
+        const originalConsonant = consonant;
+        const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
 
-    // 音調変化のルール (既存のコード)
-    if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
-        toneChange = 1;
-    } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
-        toneChange = 2;
-    } else if (/ghŭ|gh|ng|rŭ|sŭ|shŭ|zŭ/.test(consonant)) {
-        toneChange = 0;
-    } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
-        toneChange = 1;
-    } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
-        toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
-    }
+        if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
+            toneChange = 1;
+        } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
+            toneChange = 2;
+        } else if (/ghŭ|gh|ng|rŭ|sŭ|shŭ|zŭ/.test(consonant)) {
+            toneChange = 0;
+        } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
+            toneChange = 1;
+        } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
+            toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
+        }
 
-    // 子音削除処理
-    if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
-        consonant = nonVowels.slice(-3).join('');
-    } else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
-        consonant = nonVowels.slice(-2).join('');
-    } else if (nonVowels.length >= 1) {
-        consonant = nonVowels[nonVowels.length - 1];
-    }
+        if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
+            consonant = nonVowels.slice(-3).join('');
+        } else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
+            consonant = nonVowels.slice(-2).join('');
+        } else if (nonVowels.length >= 1) {
+            consonant = nonVowels[nonVowels.length - 1];
+        }
 
-    // 子音の削除が行われたかどうかの判定 (キャプチャグループの比較)
-    if (originalConsonant !== consonant) {
-        shouldApplyToneChange = true;
-    }
+        if (originalConsonant !== consonant) {
+            shouldApplyToneChange = true;
+        }
 
-    if (shouldApplyToneChange) {
-        p1 = applyToneChange(p1, toneChange);
-    }
+        if (shouldApplyToneChange) {
+            p1 = applyToneChange(p1, toneChange);
+        }
 
-    return `${p1}${consonant}${p2}`;
-        });
-        iterations++;
-    } while (modifiedWord !== word && iterations < maxIterations);
+        return `${p1}${consonant}${p2}`;
+    });
+    iterations++;
+} while (modifiedWord !== word && iterations < maxIterations);
 
-    word = modifiedWord; // ループ後の word の更新
-    // ここまで追加/変更
+word = modifiedWord;
 
 // 規則③: 語尾変換
 const endingsWithToneChange = [
