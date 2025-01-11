@@ -214,23 +214,31 @@ word = word.replace(consonantPattern, (match, offset, string) => {
     const firstConsonant = match.match(new RegExp(allConsonants.join('|')))[0];
 
     let toneChange = 0;
-    if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
+    // ★修正：声調変化の条件を修正
+    if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|c|k|p|t/.test(firstConsonant)) {
         toneChange = 1;
     } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
         toneChange = 2;
     }
 
-    // ★修正点: offsetが0の場合の処理を追加
-    if (offset > 0) { // offsetが0より大きい場合のみcharAtを実行
-        const precedingChar = string.charAt(offset - 1);
-        if (vowels.includes(precedingChar)) {
+    // ★修正：直前の母音に声調変化を適用
+    if (offset > 0) {
+        let precedingIndex = offset - 1;
+        // 直前が母音でない場合はさらに前を探す
+        while (precedingIndex >= 0 && !vowels.includes(string.charAt(precedingIndex))) {
+            precedingIndex--;
+        }
+
+        if (precedingIndex >= 0) {
+            const precedingChar = string.charAt(precedingIndex);
             const modifiedVowel = applyToneChange(precedingChar, toneChange);
-            return string.substring(0, offset - 1) + modifiedVowel + match + string.substring(offset + match.length);
+            // 文字列を再構築
+            return string.substring(0, precedingIndex) + modifiedVowel + string.substring(precedingIndex + 1, offset) + match + string.substring(offset + match.length);
         } else {
-            return match;
+            return match; // 直前に母音がない場合は変更しない
         }
     } else {
-        return match; // offsetが0の場合は変更せずに返す
+        return match; // offsetが0の場合は変更しない
     }
 });
 
