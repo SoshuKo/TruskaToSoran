@@ -148,14 +148,20 @@ const consonants = [
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`, 'g'); // キャプチャグループを追加
+// 子音のみを抽出する正規表現
+const consonantRegex = new RegExp(`[${consonants.join('')}]+`, 'g');
 
-word = word.replace(vowelPattern, (match, p1, consonant, p2) => {
+word = word.replace(new RegExp(`(${vowels.join('|')})`, 'g'), (vowel, offset) => {
+    // 次の母音までの子音を取得
+    let nextVowelOffset = word.slice(offset + vowel.length).search(new RegExp(vowels.join('|')));
+    if (nextVowelOffset === -1) {
+        return vowel; // 次の母音が見つからない場合はそのまま返す
+    }
+    const consonant = word.slice(offset + vowel.length, offset + vowel.length + nextVowelOffset);
+    let modifiedConsonant = consonant;
     let toneChange = 0;
     let shouldApplyToneChange = false;
 
-    // 子音部分をさらに分解して、削除処理前の状態を保持
-    const originalConsonant = consonant;
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
     const originalNonVowelsLength = nonVowels.length;
 
@@ -174,23 +180,23 @@ word = word.replace(vowelPattern, (match, p1, consonant, p2) => {
 
     // 子音削除処理
     if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
-        consonant = nonVowels.slice(-3).join('');
+        modifiedConsonant = nonVowels.slice(-3).join('');
     } else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
-        consonant = nonVowels.slice(-2).join('');
+        modifiedConsonant = nonVowels.slice(-2).join('');
     } else if (nonVowels.length >= 1) {
-        consonant = nonVowels[nonVowels.length - 1];
+        modifiedConsonant = nonVowels[nonVowels.length - 1];
     }
 
-    // 子音の削除が行われたかどうかの判定 (キャプチャグループの比較)
-    if (originalConsonant !== consonant) {
+    if (originalNonVowelsLength > 0 && modifiedConsonant.length < originalNonVowelsLength) {
         shouldApplyToneChange = true;
     }
 
+    let modifiedVowel = vowel;
     if (shouldApplyToneChange) {
-        p1 = applyToneChange(p1, toneChange);
+        modifiedVowel = applyToneChange(vowel, toneChange);
     }
 
-    return `${p1}${consonant}${p2}`;
+    return `${modifiedVowel}${modifiedConsonant}`;
 });
     
 // 規則③: 語尾変換
