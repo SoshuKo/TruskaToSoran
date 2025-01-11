@@ -277,11 +277,15 @@ document.addEventListener('DOMContentLoaded', () => {
     convertButton.addEventListener('click', () => {
         const inputText = inputField.value;
         
-        // Split the input text by newlines or spaces, applying transformation to each word
+        // Split the input text by newlines, applying transformation to each line
         const transformedText = inputText
-            .split(/\s+/) // Split by spaces and newlines
-            .map(word => transformWord(word)) // Apply the transformation
-            .join(' '); // Join the transformed words with a space (or use '\n' for newlines)
+            .split(/\n/) // Split by newlines
+            .map(line => 
+                line.split(/\s+/) // Split each line by spaces
+                .map(word => transformWord(word)) // Apply the transformation to each word
+                .join(' ') // Join transformed words with a space
+            )
+            .join('\n'); // Join the transformed lines with a newline
 
         // Display the transformed text
         outputField.value = transformedText;
