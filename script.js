@@ -148,12 +148,14 @@ const consonants = [
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
+    // ★ ここが重要な修正箇所: グローバルフラグ(/g)を削除
     const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`);
 
     let modifiedWord = word;
     let iterations = 0;
     const maxIterations = 10;
 
+    // ★ do...while ループは1つだけ
     do {
         word = modifiedWord;
         modifiedWord = word.replace(vowelPattern, (match, p1, consonant, p2) => {
@@ -162,9 +164,8 @@ const consonants = [
 
             const originalConsonant = consonant;
             const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
-            const originalNonVowelsLength = nonVowels.length;
 
-    // 音調変化のルール
+    // 音調変化のルール (既存のコード)
     if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
         toneChange = 1;
     } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
@@ -233,18 +234,18 @@ const consonants = [
                     consonant = nonVowels[nonVowels.length - 1];
                 }
 
-                if (originalConsonant !== consonant) {
-                    shouldApplyToneChange = true;
-                }
+            if (originalConsonant !== consonant) {
+                shouldApplyToneChange = true;
+            }
 
-                if (shouldApplyToneChange) {
-                    p1 = applyToneChange(p1, toneChange);
-                }
+            if (shouldApplyToneChange) {
+                p1 = applyToneChange(p1, toneChange);
+            }
 
-                return `${p1}${consonant}${p2}`;
-            });
+            return `${p1}${consonant}${p2}`;
+        });
         iterations++;
-    } while (modifiedWord !== word && iterations < maxIterations); // 変更がなくなるまで繰り返す
+    } while (modifiedWord !== word && iterations < maxIterations);
 
     word = modifiedWord;
     // ここまで追加/変更
