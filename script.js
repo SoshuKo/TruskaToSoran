@@ -426,8 +426,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .split(/\n/) // Split by newlines
             .map(line => 
                 line.split(/\s+/) // Split each line by spaces
-                .map(word => transformWord(originalWord)) // Apply the transformation to each word
-                .join(' ') // Join transformed words with a space
+                .map(word => transformWord(word)) // wordを渡すように修正
+                .join(' ')
             )
             .join('\n'); // Join the transformed lines with a newline
 
