@@ -24,10 +24,6 @@ function applyTransformations(word) {
 
 const vowels = ["ĭā", "ā", "ī", "ȳ", "ū", "ĭū", "ĭē", "ē", "ō", "ĭō", "a", "e", "i", "o", "u", "y", "üa", "üā", "üē", "üō"];
 
-function convertSentence(sentence) {
-    return sentence.split(/\s+/).map(transformWord).join(' ');
-}
-
 function applyToneChange(vowel, toneChange) {
     const toneMap = {
         'ĭā': ['ĭâ', 'ĭà'],
