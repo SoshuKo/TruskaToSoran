@@ -203,45 +203,38 @@ const allConsonants = [
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
     "s", "t", "v", "w", "x", "z", "'"
 ];
-const consonantPattern = new RegExp(`(${allConsonants.join('|')})+`, 'g');
+    const consonantMatch = word.match(new RegExp(`(${allConsonants.join('|')})+`, 'g'));
 
-word = word.replace(consonantPattern, (match, offset, string) => {
-    if (match.length <= 1) {
-        return match; // 子音が1つ以下なら何もしない
+    if (consonantMatch && consonantMatch.length > 0) {
+        consonantMatch.forEach(consonantSequence => {
+            let firstConsonant = "";
+            let tempMatch = consonantSequence;
+            for (const consonant of allConsonants) {
+                if (tempMatch.startsWith(consonant)) {
+                    firstConsonant = consonant;
+                    break;
+                }
+            }
+            if(firstConsonant !== ""){
+                let toneChange = 0;
+                if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
+                    toneChange = 1;
+                } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
+                    toneChange = 2;
+                }
+    
+                if (toneChange !== 0) {
+                    const precedingVowelMatch = word.match(new RegExp(`(${vowels.join('|')})(?=${consonantSequence})`));
+                    if (precedingVowelMatch) {
+                        const precedingVowel = precedingVowelMatch[1];
+                        const modifiedPrecedingVowel = applyToneChange(precedingVowel, toneChange);
+                        word = word.replace(precedingVowel, modifiedPrecedingVowel);
+                    }
+                }
+            }
+        });
     }
-
-    const firstConsonant = allConsonants.find(consonant => match.startsWith(consonant));
-    if (!firstConsonant) {
-        return match;
-    }
-
-    let toneChange = 0;
-    if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|c|k|p|t|'/.test(firstConsonant)) {
-        toneChange = 1;
-    } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
-        toneChange = 2;
-    }
-
-    if (offset > 0) {
-        let precedingIndex = offset - 1;
-        while (precedingIndex >= 0 && !vowels.includes(string.charAt(precedingIndex))) {
-            precedingIndex--;
-        }
-
-        if (precedingIndex >= 0) {
-            const precedingVowel = string.charAt(precedingIndex);
-            // ★デバッグ用：母音とtoneChangeを出力
-            console.log("Preceding Vowel:", precedingVowel);
-            console.log("Tone Change:", toneChange);
-            const modifiedVowel = applyToneChange(precedingVowel, toneChange);
-            // ★デバッグ用：変更後の母音を出力
-            console.log("Modified Vowel:", modifiedVowel);
-            return string.substring(0, precedingIndex) + modifiedVowel + string.substring(precedingIndex + 1, offset) + match + string.substring(offset + match.length);
-        }
-    }
-    return match;
-});
-
+    
 // 規則B
 const allConsonantsB = [
     "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
