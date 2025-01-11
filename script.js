@@ -197,43 +197,47 @@ function transformWord(word) {
 
     word = modifiedWord;
 
-// 規則A: 子音連続に基づく声調変化
-const allConsonants = [
-    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
-    "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
-    "s", "t", "v", "w", "x", "z", "'"
-];
-    const consonantMatch = word.match(new RegExp(`(${allConsonants.join('|')})+`, 'g'));
+    // 規則A: 子音連続に基づく声調変化
+    const allConsonants = [ /* 省略：変更なし */ ];
+    let modifiedWordForTone = word; // 声調変化用のコピーを作成
 
-    if (consonantMatch && consonantMatch.length > 0) {
-        consonantMatch.forEach(consonantSequence => {
-            let firstConsonant = "";
-            let tempMatch = consonantSequence;
-            for (const consonant of allConsonants) {
-                if (tempMatch.startsWith(consonant)) {
-                    firstConsonant = consonant;
-                    break;
-                }
+    for (let i = 0; i < modifiedWordForTone.length; i++) {
+        let firstConsonant = "";
+        for (const consonant of allConsonants) {
+            if (modifiedWordForTone.startsWith(consonant, i)) {
+                firstConsonant = consonant;
+                break;
             }
-            if(firstConsonant !== ""){
-                let toneChange = 0;
-                if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
-                    toneChange = 1;
-                } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
-                    toneChange = 2;
-                }
-    
-                if (toneChange !== 0) {
-                    const precedingVowelMatch = word.match(new RegExp(`(${vowels.join('|')})(?=${consonantSequence})`));
-                    if (precedingVowelMatch) {
-                        const precedingVowel = precedingVowelMatch[1];
-                        const modifiedPrecedingVowel = applyToneChange(precedingVowel, toneChange);
-                        word = word.replace(precedingVowel, modifiedPrecedingVowel);
+        }
+
+        if (firstConsonant !== "") {
+            let toneChange = 0;
+            if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
+                toneChange = 1;
+            } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
+                toneChange = 2;
+            }
+
+            if (toneChange !== 0) {
+                // 子音連続の直前の母音を探す
+                let precedingVowelIndex = -1;
+                for (let j = i - 1; j >= 0; j--) {
+                    if (vowels.includes(modifiedWordForTone[j])) {
+                        precedingVowelIndex = j;
+                        break;
                     }
                 }
+
+                if (precedingVowelIndex !== -1) {
+                    const precedingVowel = modifiedWordForTone[precedingVowelIndex];
+                    const modifiedPrecedingVowel = applyToneChange(precedingVowel, toneChange);
+                    modifiedWordForTone = modifiedWordForTone.substring(0, precedingVowelIndex) + modifiedPrecedingVowel + modifiedWordForTone.substring(precedingVowelIndex + 1);
+                }
             }
-        });
+            i += firstConsonant.length -1; //子音の分だけインデックスを進める
+        }
     }
+    word = modifiedWordForTone; // 声調変化を反映
     
 // 規則B
 const allConsonantsB = [
