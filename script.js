@@ -151,48 +151,42 @@ const consonants = [
 const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`, 'g');
 
 word = word.replace(vowelPattern, (match, p1, consonant, p2) => {
-    let modifiedConsonant = "";
+    let modifiedConsonant = consonant;
     let toneChange = 0;
     let shouldApplyToneChange = false;
 
-    // 子音を個々の文字に分解して処理
-    const consonantChars = consonant.split('');
-    const nonVowels = consonantChars.filter(char => !vowels.includes(char));
-    const originalNonVowelsLength = nonVowels.length;
+    const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
 
-    if (originalNonVowelsLength > 0) {
-        let tempConsonant = consonant;
-        let tempNonVowels = nonVowels;
+    if (nonVowels.length > 0) { // 子音が存在する場合のみ処理を行う
 
-        // 音調変化のルールを適用 (最初の母音にのみ適用)
-        if (/ch’|khŭ|phŭ|thŭ/.test(tempConsonant)) {
+        // 音調変化のルール
+        if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
             toneChange = 1;
-        } else if (/bŭ|dŭ|gŭ|jŭ/.test(tempConsonant)) {
+        } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
             toneChange = 2;
-        } else if (/ghŭ|gh|ng|rŭ|sŭ|shŭ|zŭ/.test(tempConsonant)) {
+        } else if (/ghŭ|gh|ng|rŭ|sŭ|shŭ|zŭ/.test(consonant)) {
             toneChange = 0;
-        } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(tempConsonant)) {
+        } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
             toneChange = 1;
-        } else if (/'|b|c|d|g|j|k|p|t/.test(tempConsonant)) {
-            toneChange = /b|d|g|j/.test(tempConsonant) ? 2 : 1;
+        } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
+            toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
         }
 
+        const originalNonVowelsLength = nonVowels.length
 
         // 子音削除処理
-        if (tempNonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(tempConsonant)) {
-            modifiedConsonant = tempNonVowels.slice(-3).join('');
-        } else if (tempNonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(tempConsonant)) {
-            modifiedConsonant = tempNonVowels.slice(-2).join('');
-        } else if (tempNonVowels.length >= 1) {
-            modifiedConsonant = tempNonVowels[tempNonVowels.length - 1];
+        if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
+            modifiedConsonant = nonVowels.slice(-3).join('');
+        } else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
+            modifiedConsonant = nonVowels.slice(-2).join('');
+        } else if (nonVowels.length >= 1) {
+            modifiedConsonant = nonVowels[nonVowels.length - 1];
         }
 
-        if (originalNonVowelsLength > 0 && modifiedConsonant.length < originalNonVowelsLength) {
-            shouldApplyToneChange = true;
+        if (originalNonVowelsLength > modifiedConsonant.length) {
+          shouldApplyToneChange = true;
         }
-
     }
-
 
     if (shouldApplyToneChange) {
         p1 = applyToneChange(p1, toneChange);
