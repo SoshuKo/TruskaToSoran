@@ -196,6 +196,7 @@ const endingsWithToneChange = [
     { pattern: /d$/, replacement: '', toneChange: 2 },  // d → 子音なし (声調変化2)
     { pattern: /dŭ$/, replacement: '', toneChange: 2 },  // dŭ → 子音なし (声調変化2)
     { pattern: /f$/, replacement: 'n', toneChange: 0 },  // f → n
+    { pattern: /ng$/, replacement: 'Ng', toneChange: 0 },  // ng → Ng
     { pattern: /g$/, replacement: '', toneChange: 2 },  // g → 子音なし (声調変化2)
     { pattern: /gh$/, replacement: 'Ng', toneChange: 0 },  // gh → Ng
     { pattern: /ghŭ$/, replacement: 'Ng', toneChange: 0 },  // ghŭ → Ng
@@ -207,7 +208,6 @@ const endingsWithToneChange = [
     { pattern: /kh$/, replacement: '', toneChange: 1 },  // kh → 子音なし (声調変化1)
     { pattern: /khŭ$/, replacement: '', toneChange: 1 },  // khŭ → 子音なし (声調変化1)
     { pattern: /m$/, replacement: 'n', toneChange: 0 },  // m → n
-    { pattern: /ng$/, replacement: 'Ng', toneChange: 0 },  // ng → Ng
     { pattern: /n$/, replacement: 'n', toneChange: 0 },  // n → n
     { pattern: /p$/, replacement: '', toneChange: 1 },  // p → 子音なし (声調変化1)
     { pattern: /p’$/, replacement: '', toneChange: 1 },  // p’ → 子音なし (声調変化1)
@@ -225,7 +225,7 @@ const endingsWithToneChange = [
     { pattern: /thŭ$/, replacement: '', toneChange: 1 },  // thŭ → 子音なし (声調変化1)
     { pattern: /v$/, replacement: 'n', toneChange: 0 },  // v → n
     { pattern: /w$/, replacement: 'ŭ', toneChange: 0 },  // w → ŭ
-    { pattern: /x$/, replacement: 'ng', toneChange: 0 },  // x → ng
+    { pattern: /x$/, replacement: 'Ng', toneChange: 0 },  // x → Ng
     { pattern: /z$/, replacement: 'l', toneChange: 0 },  // z → l
     { pattern: /zŭ$/, replacement: 'l', toneChange: 0 }  // zŭ → l
 ];
