@@ -148,14 +148,14 @@ const consonants = [
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-    // ★ ここが重要な修正箇所: グローバルフラグ(/g)を削除
+    // ★ 修正箇所1: グローバルフラグ /g を削除
     const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`);
 
     let modifiedWord = word;
     let iterations = 0;
     const maxIterations = 10;
-
-    // ★ do...while ループは1つだけ
+    
+    // ★ 修正箇所2: do...while ループは1つのみ
     do {
         word = modifiedWord;
         modifiedWord = word.replace(vowelPattern, (match, p1, consonant, p2) => {
@@ -248,6 +248,7 @@ const consonants = [
     } while (modifiedWord !== word && iterations < maxIterations);
 
     word = modifiedWord;
+}
     // ここまで追加/変更
 
 // 規則③: 語尾変換
