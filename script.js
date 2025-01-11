@@ -170,12 +170,12 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
 
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
 
-    // D: 三文字子音が最後の子音以外であれば削除する
+    // 三文字子音が最後の子音の場合のみ最後の三文字を残す [A]
     if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
         consonant = nonVowels.slice(-3).join(''); // 最後の三文字を残す
         shouldApplyToneChange = false;
     }
-    // E: 二文字子音が最後の子音以外であれば削除する
+    // 二文字子音が最後の子音の場合のみ最後の二文字を残す [B]
     else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
         consonant = nonVowels.slice(-2).join(''); // 最後の二文字を残す
         shouldApplyToneChange = false;
@@ -185,8 +185,13 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         consonant = nonVowels[nonVowels.length - 1]; // 最後の一文字のみ残す
     }
 
-    // E: 子音が削除された場合に音調変更を適用
-    if (shouldApplyToneChange && nonVowels.length > 1) {
+    // D: 子音連続の最後の子音以外の子音は全て削除
+    if (nonVowels.length > 1 && !/ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ|c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|gh|ng|ph|sh|th/.test(consonant)) {
+        consonant = ''; // 他の子音を削除
+    }
+
+    // E: 子音連続によって三文字子音、二文字子音が削除される際の声調変化を有効にする
+    if (shouldApplyToneChange && nonVowels.length > 1 && consonant !== '') {
         p1 = applyToneChange(p1, toneChange);
     }
 
