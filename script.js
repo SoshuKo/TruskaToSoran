@@ -143,7 +143,7 @@ function transformWord(word) {
     
 // 規則②: 母音間の子音削除
 const consonants = [
-    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng", 
+    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng", 
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r", 
     "s", "t", "v", "w", "x", "z", "'"
 ];
@@ -162,7 +162,7 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         toneChange = 2;
     } else if (/ghŭ|gh|ng/.test(consonant)) {
         toneChange = 0;
-    } else if (/c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
+    } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
         toneChange = 1;
     } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
         toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
@@ -171,10 +171,10 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
 
 // 二文字子音または三文字子音があるかどうかをチェックする
-if (nonVowels.length === 3 && /ghŭ/.test(nonVowels.join(''))) {
+if (nonVowels.length === 3 && /chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(nonVowels.join(''))) {
     consonant = nonVowels.join(''); // 三文字子音をそのまま残す
     shouldApplyToneChange = false; // 子音削除が行われない場合は音調変更しない
-} else if (nonVowels.length === 2 && /gh|kh|ng|ph|sh|th/.test(nonVowels.join(''))) {
+} else if (nonVowels.length === 2 && /ch|gh|kh|ng|ph|sh|th/.test(nonVowels.join(''))) {
     consonant = nonVowels.join(''); // 二文字子音をそのまま残す
     shouldApplyToneChange = false; // 子音削除が行われない場合は音調変更しない
 } else if (nonVowels.length > 1) {
