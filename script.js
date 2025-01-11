@@ -197,14 +197,15 @@ function transformWord(word) {
 
     word = modifiedWord;
 
+    // 規則A: 子音連続に基づく声調変化
     const allConsonants = [
     "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
     "s", "t", "v", "w", "x", "z", "'"
 ]; 
-    let modifiedWordForTone = word; // 声調変化用のコピーを作成
+        
+    let modifiedWordForTone = word;
 
-    // allConsonantsを長さの降順にソートすることで、より長い子音を優先的にマッチさせる
     allConsonants.sort((a, b) => b.length - a.length);
 
     for (let i = 0; i < modifiedWordForTone.length; i++) {
@@ -212,8 +213,12 @@ function transformWord(word) {
 
         for (const consonant of allConsonants) {
             if (modifiedWordForTone.startsWith(consonant, i)) {
-                matchedConsonant = consonant;
-                break;
+                // 子音の後に別の文字（子音または文字列の終わり）が続くかチェック
+                const nextChar = modifiedWordForTone[i + consonant.length];
+                if (nextChar === undefined || allConsonants.some(c => modifiedWordForTone.startsWith(c,i+consonant.length))) {
+                    matchedConsonant = consonant;
+                    break;
+                }
             }
         }
 
@@ -240,11 +245,11 @@ function transformWord(word) {
                     modifiedWordForTone = modifiedWordForTone.substring(0, precedingVowelIndex) + modifiedPrecedingVowel + modifiedWordForTone.substring(precedingVowelIndex + 1);
                 }
             }
-            i += matchedConsonant.length - 1; //子音の分だけインデックスを進める
+            i += matchedConsonant.length - 1;
         }
     }
 
-    word = modifiedWordForTone; // 声調変化を反映
+    word = modifiedWordForTone;
     
 // 規則B
 const allConsonantsB = [
