@@ -334,10 +334,13 @@ const endingsWithToneChange = [
 
 endingsWithToneChange.forEach(({ pattern, replacement, toneChange }) => {
     if (pattern.test(word)) {
-        // 語尾の子音に基づいて音調変更を適用
-        const vowel = word.match(vowels.join('|')).pop(); // 母音を取得
-        const modifiedVowel = applyToneChange(vowel, toneChange);
-        word = word.replace(vowel, modifiedVowel).replace(pattern, replacement);
+        // 語尾の子音の左隣の母音を取得
+        const match = word.match(new RegExp(`(${vowels.join('|')})[^${vowels.join('|')}]*${pattern.source.slice(1, -1)}$`));
+        if (match) {
+            const vowel = match[1];
+            const modifiedVowel = applyToneChange(vowel, toneChange);
+            word = word.replace(vowel, modifiedVowel).replace(pattern, replacement);
+        }
     }
 });
 
