@@ -208,7 +208,7 @@ const allConsonants = [
 const toneChangeConsonants1 = ["ch’", "khŭ", "phŭ", "thŭ", "ch", "c’", "k’", "p’", "t’", "kh", "ph", "th", "'", "c", "k", "p", "t"];
 const toneChangeConsonants2 = ["bŭ", "dŭ", "gŭ", "jŭ", "b", "d", "g", "j"];
 
-word = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonants.join('|')})+`, 'g'), (match, p1, matchConsonants) => { //キャプチャグループ追加
+word = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonants.join('|')})+`, 'g'), (match, p1, matchConsonants) => {
     let lastConsonant = "";
     let tempMatch = matchConsonants;
     let firstRemovedConsonant = "";
@@ -233,7 +233,7 @@ word = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonants.join('|')}
     } else if (lastConsonant !== ""){
         
     } else {
-        return p1; //子音が無ければ母音だけ返す
+        return p1;
     }
     firstRemovedConsonant = matchConsonants.replace(new RegExp(lastConsonant + '$'), '');
     if(firstRemovedConsonant !== ""){
@@ -247,7 +247,7 @@ word = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonants.join('|')}
         return p1 + lastConsonant;//削除する子音が無ければそのまま返す
     }
 
-
+    // ★ 声調変化を適用する位置を移動
     if (toneChangeConsonants1.includes(firstRemovedConsonant)) {
         toneChange = 1;
     } else if (toneChangeConsonants2.includes(firstRemovedConsonant)) {
@@ -257,6 +257,7 @@ word = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonants.join('|')}
     if (toneChange !== 0) {
         p1 = applyToneChange(p1, toneChange);
     }
+
     return p1 + lastConsonant;
 });
     
