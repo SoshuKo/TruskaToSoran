@@ -267,7 +267,7 @@ endingsWithToneChange.forEach(({ pattern, replacement, toneChange }) => {
     });
     
         // 新しい変換規則を追加
-    const deleteHPattern = /([h’|hŭ|h|ŭ])(?![ĭā|ā|ī|ȳ|ū|ĭū|ĭē|ē|ō|ĭō|a|e|i|o|u|y|üa|üā|üē|üō])/g;
+    const deleteHPattern = /([h’|hŭ|h|ŭ])(?![ĭā|ā|ī|ȳ|ū|ĭū|ĭē|ē|ō|ĭō|a|e|i|o|u|y|ĭâ|ĭà|â|à|î|ì|ŷ|ỳ|û|ù|ĭû|ĭù|ĭê|ĭè|ê|è|ô|ò|ĭô|ĭò|á|ã|é|ẽ|í|ĩ|ó|õ|ú|ũ|ý|ỹ])/g;
     
     // 変換処理に新しい規則を適用
     word = word.replace(deleteHPattern, '');  // h', hŭ, h, ŭ を削除
