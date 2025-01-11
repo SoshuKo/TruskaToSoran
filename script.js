@@ -1,4 +1,6 @@
 function transformWord(word) {
+    // originalWord を定義。変換前の単語を保持
+    const originalWord = word;
     // 改行やスペースで単語を分割して処理
     const splitWords = word.split(/(\s|\n)/);  // スペースまたは改行で分割
     
@@ -424,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .split(/\n/) // Split by newlines
             .map(line => 
                 line.split(/\s+/) // Split each line by spaces
-                .map(word => transformWord(word)) // Apply the transformation to each word
+                .map(word => transformWord(originalWord)) // Apply the transformation to each word
                 .join(' ') // Join transformed words with a space
             )
             .join('\n'); // Join the transformed lines with a newline
