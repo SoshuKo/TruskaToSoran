@@ -198,10 +198,10 @@ const endingsWithToneChange = [
     { pattern: /d$/, replacement: '', toneChange: 2 },  // d → 子音なし (声調変化2)
     { pattern: /dŭ$/, replacement: '', toneChange: 2 },  // dŭ → 子音なし (声調変化2)
     { pattern: /f$/, replacement: 'n', toneChange: 0 },  // f → n
-    { pattern: /ng$/, replacement: 'Ng', toneChange: 0 },  // ng → Ng
+    { pattern: /ng$/, replacement: 'NG', toneChange: 0 },  // ng → NG
     { pattern: /g$/, replacement: '', toneChange: 2 },  // g → 子音なし (声調変化2)
-    { pattern: /gh$/, replacement: 'Ng', toneChange: 0 },  // gh → Ng
-    { pattern: /ghŭ$/, replacement: 'Ng', toneChange: 0 },  // ghŭ → Ng
+    { pattern: /gh$/, replacement: 'NG', toneChange: 0 },  // gh → NG
+    { pattern: /ghŭ$/, replacement: 'NG', toneChange: 0 },  // ghŭ → NG
     { pattern: /gŭ$/, replacement: '', toneChange: 2 },  // gŭ → 子音なし (声調変化2)
     { pattern: /j$/, replacement: '', toneChange: 2 },  // j → 子音なし (声調変化2)
     { pattern: /jŭ$/, replacement: '', toneChange: 2 },  // jŭ → 子音なし (声調変化2)
@@ -227,7 +227,7 @@ const endingsWithToneChange = [
     { pattern: /thŭ$/, replacement: '', toneChange: 1 },  // thŭ → 子音なし (声調変化1)
     { pattern: /v$/, replacement: 'n', toneChange: 0 },  // v → n
     { pattern: /w$/, replacement: 'ŭ', toneChange: 0 },  // w → ŭ
-    { pattern: /x$/, replacement: 'Ng', toneChange: 0 },  // x → Ng
+    { pattern: /x$/, replacement: 'NG', toneChange: 0 },  // x → NG
     { pattern: /z$/, replacement: 'l', toneChange: 0 },  // z → l
     { pattern: /zŭ$/, replacement: 'l', toneChange: 0 }  // zŭ → l
 ];
@@ -260,7 +260,7 @@ endingsWithToneChange.forEach(({ pattern, replacement, toneChange }) => {
     });
 
     // 最後の変換
-    word = word.replace(/Ng/g, 'ng');
+    word = word.replace(/NG/g, 'ng');
     
     return word;  // 関数の戻り値
 }
