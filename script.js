@@ -197,6 +197,11 @@ function transformWord(word) {
 
     word = modifiedWord;
 
+    const allConsonants = [
+    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
+    "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
+    "s", "t", "v", "w", "x", "z", "'"
+]; 
     let modifiedWordForTone = word; // 声調変化用のコピーを作成
 
     let i = 0; // ループカウンタをwhileに変更するため、letで宣言
