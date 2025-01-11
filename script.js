@@ -204,21 +204,24 @@ function transformWord(word) {
 ]; 
     let modifiedWordForTone = word; // 声調変化用のコピーを作成
 
-    let i = 0; // ループカウンタをwhileに変更するため、letで宣言
-    while (i < modifiedWordForTone.length) { // for文からwhile文に変更
-        let firstConsonant = "";
+    // allConsonantsを長さの降順にソートすることで、より長い子音を優先的にマッチさせる
+    allConsonants.sort((a, b) => b.length - a.length);
+
+    for (let i = 0; i < modifiedWordForTone.length; i++) {
+        let matchedConsonant = null;
+
         for (const consonant of allConsonants) {
             if (modifiedWordForTone.startsWith(consonant, i)) {
-                firstConsonant = consonant;
+                matchedConsonant = consonant;
                 break;
             }
         }
 
-        if (firstConsonant !== "") {
+        if (matchedConsonant) {
             let toneChange = 0;
-            if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
+            if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(matchedConsonant)) {
                 toneChange = 1;
-            } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
+            } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(matchedConsonant)) {
                 toneChange = 2;
             }
 
@@ -237,11 +240,10 @@ function transformWord(word) {
                     modifiedWordForTone = modifiedWordForTone.substring(0, precedingVowelIndex) + modifiedPrecedingVowel + modifiedWordForTone.substring(precedingVowelIndex + 1);
                 }
             }
-            i += firstConsonant.length; // インデックスの進め方を修正
-        } else {
-            i++; // 子音が見つからない場合はインデックスを進める
+            i += matchedConsonant.length - 1; //子音の分だけインデックスを進める
         }
     }
+
     word = modifiedWordForTone; // 声調変化を反映
     
 // 規則B
