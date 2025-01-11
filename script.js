@@ -197,17 +197,39 @@ function transformWord(word) {
 
     word = modifiedWord;
 
-// 規則A: 子音連続の削除
-word = word.replace(new RegExp(`([^${vowels.join('')}])([^${vowels.join('')}]+)(?=[^${vowels.join('')}]|$)`, 'g'), (match, firstConsonant, restOfConsonants) => {
-    // gが最後の子音の場合のngの処理
-    if (restOfConsonants.endsWith('g') && restOfConsonants.length > 1 && restOfConsonants.slice(-2) === 'ng') {
-        return firstConsonant + "ng";
+// 規則A
+const allConsonants = [
+    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
+    "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
+    "s", "t", "v", "w", "x", "z", "'"
+];
+
+word = word.replace(new RegExp(`(${allConsonants.join('|')})+`, 'g'), (match) => {
+    let lastConsonant = "";
+    let tempMatch = match;
+
+    for (const consonant of allConsonants) {
+        if (tempMatch.endsWith(consonant)) {
+            lastConsonant = consonant;
+            break;
+        }
     }
-
-    // 残りの子音から最後の文字を取得
-    const lastConsonant = restOfConsonants.slice(-1);
-
-    return firstConsonant + lastConsonant;
+    if (lastConsonant === "’" && match.length > 1 && match.at(-2) === 'h') {
+        lastConsonant = match.at(-3) + 'h’'
+    } else if (lastConsonant === "ŭ" && match.length > 1 && match.at(-2) === 'h') {
+        lastConsonant = match.at(-3) + 'hŭ'
+    } else if (lastConsonant === "’" && match.length > 1) {
+        lastConsonant = match.at(-2) + '’';
+    } else if (lastConsonant === "ŭ" && match.length > 1) {
+        lastConsonant = match.at(-2) + 'ŭ';
+    } else if (lastConsonant === "g" && match.length > 1 && match.at(-2) === 'n'){
+        lastConsonant = 'ng';
+    } else if (lastConsonant !== ""){
+        
+    } else {
+        return "";
+    }
+    return lastConsonant;
 });
     
 // 規則③: 語尾変換
