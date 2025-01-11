@@ -193,6 +193,139 @@ word = word.replace(vowelPattern, (match, p1, consonant, p2) => {
     return `${p1}${consonant}${p2}`;
 });
 
+    const classifyPhonemes = (word) => {
+        let phonemes = [];
+        let remainingWord = word;
+        while (remainingWord.length > 0) {
+            let found = false;
+            for (const vowel of vowels) {
+                if (remainingWord.startsWith(vowel)) {
+                    phonemes.push('V');
+                    remainingWord = remainingWord.substring(vowel.length);
+                    found = true;
+                    break;
+                }
+            }
+            if (found) continue;
+            for (const consonant of consonants) {
+                if (remainingWord.startsWith(consonant)) {
+                    phonemes.push('C');
+                    remainingWord = remainingWord.substring(consonant.length);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                // 未知の文字はそのまま追加（エラー回避）
+                phonemes.push(remainingWord[0]);
+                remainingWord = remainingWord.substring(1);
+            }
+        }
+        return phonemes;
+    };
+
+    // 規則B & C: 子音連続の処理と声調変化 (追加)
+    const handleConsonantClusters = (word, originalWord) => { // originalWordを追加
+        const phonemes = classifyPhonemes(word);
+        let modifiedWord = "";
+        let consonantClusterStartIndex = -1;
+        let secondVowelIndex = -1;
+
+        // 2番目の母音のインデックスを探す
+        let vowelCount = 0;
+        for (let i = 0; i < phonemes.length; i++) {
+            if (phonemes[i] === 'V') {
+                vowelCount++;
+                if (vowelCount === 2) {
+                    secondVowelIndex = i;
+                    break;
+                }
+            }
+        }
+    
+        if (secondVowelIndex > 0) {
+            // 2音節目が存在する場合のみ処理を行う
+            for (let i = secondVowelIndex - 1; i >= 0; i--) {
+                if (phonemes[i] === 'C') {
+                    if (consonantClusterStartIndex === -1) {
+                        consonantClusterStartIndex = i;
+                    }
+                } else if (consonantClusterStartIndex !== -1) {
+                    // 子音連続が終わった場合
+                    break;
+                }
+            }
+        }
+
+        if (consonantClusterStartIndex !== -1) {
+            // 子音連続が存在する場合
+            let removedConsonants = "";
+            for (let i = consonantClusterStartIndex; i < secondVowelIndex - 1; i++) {
+                if (phonemes[i] === 'C') {
+                    removedConsonants += originalWord.slice(
+                        (() => {
+                            let index = 0;
+                            for(let j=0; j<i; ++j) {
+                                if(phonemes[j] === 'V'){
+                                    index += vowels.find(e => originalWord.slice(index).startsWith(e)).length;
+                                } else if(phonemes[j] === 'C'){
+                                    index += consonants.find(e => originalWord.slice(index).startsWith(e)).length;
+                                } else {
+                                    index++;
+                                }
+                            }
+                            return index;
+                        })(),
+                        (() => {
+                            let index = 0;
+                            for(let j=0; j<=i; ++j) {
+                                if(phonemes[j] === 'V'){
+                                    index += vowels.find(e => originalWord.slice(index).startsWith(e)).length;
+                                } else if(phonemes[j] === 'C'){
+                                    index += consonants.find(e => originalWord.slice(index).startsWith(e)).length;
+                                } else {
+                                    index++;
+                                }
+                            }
+                            return index;
+                        })()
+                    );
+                }
+            }
+
+            // 声調変化の適用
+            if (removedConsonants.length > 0) {
+                let toneChange = 0;
+                const firstRemovedConsonant = removedConsonants.split('').find(char => consonants.includes(char) || char === "'");
+
+                if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstRemovedConsonant)) {
+                    toneChange = 1;
+                } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstRemovedConsonant)) {
+                    toneChange = 2;
+                } 
+                
+                // 2音節目の母音を取得して声調変化を適用
+                let vowelIndexInWord = 0;
+                let vowelCountInWord = 0;
+                for(let i=0; i < originalWord.length; ++i) {
+                    if(vowels.some(e => originalWord.slice(i).startsWith(e))) {
+                        vowelCountInWord++;
+                        if(vowelCountInWord == 2) {
+                            vowelIndexInWord = i;
+                            break;
+                        }
+                    }
+                }
+                const secondVowel = vowels.find(e => originalWord.slice(vowelIndexInWord).startsWith(e));
+                const modifiedSecondVowel = applyToneChange(secondVowel, toneChange);
+                word = word.replace(secondVowel, modifiedSecondVowel);
+            }
+        }
+        return word;
+    };
+
+    word = handleConsonantClusters(word, originalWord); // originalWordを渡す
+
 // 規則③: 語尾変換
 const endingsWithToneChange = [
     { pattern: /'$/, replacement: '', toneChange: 1 },  // ' → 子音なし (声調変化1)
