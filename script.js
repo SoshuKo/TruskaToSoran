@@ -230,11 +230,16 @@ word = word.replace(consonantPattern, (match, offset, string) => {
 
         if (precedingIndex >= 0) {
             const precedingVowel = string.charAt(precedingIndex);
+            // ★デバッグ用：母音とtoneChangeを出力
+            console.log("Preceding Vowel:", precedingVowel);
+            console.log("Tone Change:", toneChange);
             const modifiedVowel = applyToneChange(precedingVowel, toneChange);
+            // ★デバッグ用：変更後の母音を出力
+            console.log("Modified Vowel:", modifiedVowel);
             return string.substring(0, precedingIndex) + modifiedVowel + string.substring(precedingIndex + 1, offset) + match + string.substring(offset + match.length);
         }
     }
-    return match; // 変更しない場合は元のmatchを返す
+    return match;
 });
 
 // 規則B
