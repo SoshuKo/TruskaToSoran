@@ -162,7 +162,7 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
     // 特定の子音を削除しない場合でも音調変更しないようにする
     if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
         toneChange = 1;
-    } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
+    } else if (/bŭ|dŭ|gh|gŭ|jŭ/.test(consonant)) {
         toneChange = 2;
     } else if (/c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
         toneChange = 1;
