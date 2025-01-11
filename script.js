@@ -193,17 +193,6 @@ word = word.replace(vowelPattern, (match, p1, consonant, p2) => {
     return `${p1}${consonant}${p2}`;
 });
 
-// 規則A: 2音節目のVの左の子音連続に規則②を再適用
-const syllables = word.split(/([ĭā|ā|ī|ȳ|ū|ĭū|ĭē|ē|ō|ĭō|a|e|i|o|u|y|üa|üā|üē|üō|ĭâ|ĭà|â|à|î|ì|ŷ|ỳ|û|ù|ĭû|ĭù|ĭê|ĭè|ê|è|ô|ò|ĭô|ĭò|á|ã|é|ẽ|í|ĩ|ó|õ|ú|ũ|ý|ỹ]+)/); // 音節分割
-if (syllables.length > 2) {
-    const secondVowelIndex = syllables[1].indexOf(syllables[1].match(/[ĭā|ā|ī|ȳ|ū|ĭū|ĭē|ē|ō|ĭō|a|e|i|o|u|y|üa|üā|üē|üō|ĭâ|ĭà|â|à|î|ì|ŷ|ỳ|û|ù|ĭû|ĭù|ĭê|ĭè|ê|è|ô|ò|ĭô|ĭò|á|ã|é|ẽ|í|ĩ|ó|õ|ú|ũ|ý|ỹ]/i));
-    const leftConsonants = syllables[1].slice(0, secondVowelIndex); // 2音節目のVの左の子音部分
-
-    if (/[ch’|ghŭ|khŭ|phŭ|shŭ|thŭ|bŭ|ch|c’|dŭ|gh|gŭ|jŭ|k’|kh|ng|p’|ph|rŭ|sh|sŭ|t’|th|zŭ|b|c|d|f|g|j|k|m|n|p|r|s|t|v|w|x|z|']/i.test(leftConsonants)) { // 子音連続チェック
-        word = applyTransformationsToConsonantCluster(leftConsonants, word); // 規則②を再適用
-    }
-}
-    
 // 規則③: 語尾変換
 const endingsWithToneChange = [
     { pattern: /'$/, replacement: '', toneChange: 1 },  // ' → 子音なし (声調変化1)
