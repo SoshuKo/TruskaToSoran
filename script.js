@@ -153,7 +153,17 @@ const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${v
 word = word.replace(vowelPattern, (match, p1, p2) => {
     let consonant = match.slice(p1.length, match.length - p2.length);
     let toneChange = 0;
-    let shouldApplyToneChange = true;
+    let shouldApplyToneChange = false;
+
+    // 子音を削除するかどうかを判定するために、元の子音列と分割後の子音列の長さを比較
+    const originalConsonantLength = consonant.length;
+    const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
+    const nonVowelsLength = nonVowels.length;
+
+    // 子音が削除されていれば音調変更を有効にする
+    if (originalConsonantLength > nonVowelsLength) {
+        shouldApplyToneChange = true;
+    }
 
     // 特定の子音を削除しない場合でも音調変更しないようにする
     if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
@@ -168,26 +178,24 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
     }
 
-    const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
-
     // 三文字子音が最後の子音の場合のみ最後の三文字を残す [A]
-    if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
+    if (nonVowelsLength >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
         consonant = nonVowels.slice(-3).join(''); // 最後の三文字を残す
         shouldApplyToneChange = false;
     }
     // 二文字子音が最後の子音の場合のみ最後の二文字を残す [B]
-    else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
+    else if (nonVowelsLength >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
         consonant = nonVowels.slice(-2).join(''); // 最後の二文字を残す
         shouldApplyToneChange = false;
     }
     // 一文字子音が最後の子音の場合 [C]
-    else if (nonVowels.length >= 1) {
-        consonant = nonVowels[nonVowels.length - 1]; // 最後の一文字のみ残す
+    else if (nonVowelsLength >= 1) {
+        consonant = nonVowels[nonVowelsLength - 1]; // 最後の一文字のみ残す
     }
 
     // 子音削除が行われた場合のみ音調変更を適用
-    if (shouldApplyToneChange && nonVowels.length > 1) {
-        p1 = applyToneChange(p1, toneChange);
+    if (shouldApplyToneChange) {
+        p1 = applyToneChange(p1, toneChange);  // 音調変更が適用される
     }
 
     return `${p1}${consonant}${p2}`;
