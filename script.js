@@ -149,19 +149,26 @@ const consonants = [
 
 function processWord(word) {
     let processedWord = "";
+    let remainingWord = word;
 
-    // 母音で区切られた部分を処理
-    const parts = word.split(new RegExp(`(${vowels.join('|')})`)).filter(Boolean);
+    const vowelRegex = new RegExp(`(${vowels.join('|')})`);
 
-    for (let i = 0; i < parts.length; i += 2) {
-        let vowel = parts[i];
-        if(!vowels.includes(vowel)) continue;
-
-        let consonant = "";
-        if (parts[i + 1]) {
-            consonant = parts[i + 1];
+    while (remainingWord.length > 0) {
+        const vowelMatch = remainingWord.match(vowelRegex);
+        if (!vowelMatch) {
+            // 母音が見つからない場合は残りの文字列を追加して終了
+            processedWord += remainingWord;
+            break;
         }
 
+        const vowel = vowelMatch[1];
+        const vowelIndex = vowelMatch.index;
+
+        let consonant = "";
+        if (vowelIndex + vowel.length < remainingWord.length) {
+          consonant = remainingWord.substring(vowelIndex + vowel.length).split(new RegExp(`(${vowels.join('|')})`))[0]
+        }
+        
         let toneChange = 0;
         let shouldApplyToneChange = false;
         const originalConsonant = consonant;
@@ -196,6 +203,7 @@ function processWord(word) {
         }
 
         processedWord += vowel + consonant;
+        remainingWord = remainingWord.substring(vowelIndex + vowel.length + originalConsonant.length);
     }
 
     return processedWord;
