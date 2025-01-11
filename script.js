@@ -197,6 +197,19 @@ function transformWord(word) {
 
     word = modifiedWord;
 
+// 規則A: 子音連続の削除
+word = word.replace(new RegExp(`([^${vowels.join('')}])([^${vowels.join('')}]+)(?=[^${vowels.join('')}]|$)`, 'g'), (match, firstConsonant, restOfConsonants) => {
+    // gが最後の子音の場合のngの処理
+    if (restOfConsonants.endsWith('g') && restOfConsonants.length > 1 && restOfConsonants.slice(-2) === 'ng') {
+        return firstConsonant + "ng";
+    }
+
+    // 残りの子音から最後の文字を取得
+    const lastConsonant = restOfConsonants.slice(-1);
+
+    return firstConsonant + lastConsonant;
+});
+    
 // 規則③: 語尾変換
 const endingsWithToneChange = [
     { pattern: /'$/, replacement: '', toneChange: 1 },  // ' → 子音なし (声調変化1)
