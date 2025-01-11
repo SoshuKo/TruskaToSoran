@@ -197,11 +197,10 @@ function transformWord(word) {
 
     word = modifiedWord;
 
-    // 規則A: 子音連続に基づく声調変化
-    const allConsonants = [ /* 省略：変更なし */ ];
     let modifiedWordForTone = word; // 声調変化用のコピーを作成
 
-    for (let i = 0; i < modifiedWordForTone.length; i++) {
+    let i = 0; // ループカウンタをwhileに変更するため、letで宣言
+    while (i < modifiedWordForTone.length) { // for文からwhile文に変更
         let firstConsonant = "";
         for (const consonant of allConsonants) {
             if (modifiedWordForTone.startsWith(consonant, i)) {
@@ -219,7 +218,6 @@ function transformWord(word) {
             }
 
             if (toneChange !== 0) {
-                // 子音連続の直前の母音を探す
                 let precedingVowelIndex = -1;
                 for (let j = i - 1; j >= 0; j--) {
                     if (vowels.includes(modifiedWordForTone[j])) {
@@ -234,7 +232,9 @@ function transformWord(word) {
                     modifiedWordForTone = modifiedWordForTone.substring(0, precedingVowelIndex) + modifiedPrecedingVowel + modifiedWordForTone.substring(precedingVowelIndex + 1);
                 }
             }
-            i += firstConsonant.length -1; //子音の分だけインデックスを進める
+            i += firstConsonant.length; // インデックスの進め方を修正
+        } else {
+            i++; // 子音が見つからない場合はインデックスを進める
         }
     }
     word = modifiedWordForTone; // 声調変化を反映
