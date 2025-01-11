@@ -148,16 +148,21 @@ const consonants = [
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`, 'g'); // キャプチャグループを追加
+    const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`);
 
-word = word.replace(vowelPattern, (match, p1, consonant, p2) => {
-    let toneChange = 0;
-    let shouldApplyToneChange = false;
+    let modifiedWord = word;
+    let iterations = 0;
+    const maxIterations = 10;
 
-    // 子音部分をさらに分解して、削除処理前の状態を保持
-    const originalConsonant = consonant;
-    const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
-    const originalNonVowelsLength = nonVowels.length;
+    do {
+        word = modifiedWord;
+        modifiedWord = word.replace(vowelPattern, (match, p1, consonant, p2) => {
+            let toneChange = 0;
+            let shouldApplyToneChange = false;
+
+            const originalConsonant = consonant;
+            const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
+            const originalNonVowelsLength = nonVowels.length;
 
     // 音調変化のルール
     if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
