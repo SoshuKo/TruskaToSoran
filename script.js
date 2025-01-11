@@ -203,7 +203,6 @@ const allConsonants = [
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
     "s", "t", "v", "w", "x", "z", "'"
 ];
-
 const consonantPattern = new RegExp(`(${allConsonants.join('|')})+`, 'g');
 
 word = word.replace(consonantPattern, (match, offset, string) => {
@@ -211,35 +210,31 @@ word = word.replace(consonantPattern, (match, offset, string) => {
         return match; // 子音が1つ以下なら何もしない
     }
 
-    const firstConsonant = match.match(new RegExp(allConsonants.join('|')))[0];
+    const firstConsonant = allConsonants.find(consonant => match.startsWith(consonant));
+    if (!firstConsonant) {
+        return match;
+    }
 
     let toneChange = 0;
-    // ★修正：声調変化の条件を修正
-    if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|c|k|p|t/.test(firstConsonant)) {
+    if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|c|k|p|t|'/.test(firstConsonant)) {
         toneChange = 1;
     } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
         toneChange = 2;
     }
 
-    // ★修正：直前の母音に声調変化を適用
     if (offset > 0) {
         let precedingIndex = offset - 1;
-        // 直前が母音でない場合はさらに前を探す
         while (precedingIndex >= 0 && !vowels.includes(string.charAt(precedingIndex))) {
             precedingIndex--;
         }
 
         if (precedingIndex >= 0) {
-            const precedingChar = string.charAt(precedingIndex);
-            const modifiedVowel = applyToneChange(precedingChar, toneChange);
-            // 文字列を再構築
+            const precedingVowel = string.charAt(precedingIndex);
+            const modifiedVowel = applyToneChange(precedingVowel, toneChange);
             return string.substring(0, precedingIndex) + modifiedVowel + string.substring(precedingIndex + 1, offset) + match + string.substring(offset + match.length);
-        } else {
-            return match; // 直前に母音がない場合は変更しない
         }
-    } else {
-        return match; // offsetが0の場合は変更しない
     }
+    return match; // 変更しない場合は元のmatchを返す
 });
 
 // 規則B
