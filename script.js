@@ -271,7 +271,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     convertButton.addEventListener('click', () => {
         const inputText = inputField.value;
-        const outputText = transformWord(inputText);
-        outputField.value = outputText;  // textContent → value に修正
+        
+        // Split the input text by newlines or spaces, applying transformation to each word
+        const transformedText = inputText
+            .split(/\s+/) // Split by spaces and newlines
+            .map(word => transformWord(word)) // Apply the transformation
+            .join(' '); // Join the transformed words with a space (or use '\n' for newlines)
+
+        // Display the transformed text
+        outputField.value = transformedText;
     });
 });
