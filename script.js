@@ -143,19 +143,23 @@ function transformWord(word) {
     
 // 規則②: 母音間の子音削除
 const consonants = [
-    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng", 
-    "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r", 
+    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
+    "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
+const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`, 'g'); // キャプチャグループを追加
 
-word = word.replace(vowelPattern, (match, p1, p2) => {
-    let consonant = match.slice(p1.length, match.length - p2.length);
+word = word.replace(vowelPattern, (match, p1, consonant, p2) => {
     let toneChange = 0;
-    let shouldApplyToneChange = false; // 初期値をfalseに変更
+    let shouldApplyToneChange = false;
 
-    // 特定の子音を削除しない場合でも音調変更しないようにする
+    // 子音部分をさらに分解して、削除処理前の状態を保持
+    const originalConsonant = consonant;
+    const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
+    const originalNonVowelsLength = nonVowels.length;
+
+    // 音調変化のルール
     if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
         toneChange = 1;
     } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
@@ -168,28 +172,21 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
     }
 
-    const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
-    const originalNonVowelsLength = nonVowels.length; // 元の子音数を保存
-
-    // 三文字子音が最後の子音の場合のみ最後の三文字を残す [A]
+    // 子音削除処理
     if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
-        consonant = nonVowels.slice(-3).join(''); // 最後の三文字を残す
-    }
-    // 二文字子音が最後の子音の場合のみ最後の二文字を残す [B]
-    else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
-        consonant = nonVowels.slice(-2).join(''); // 最後の二文字を残す
-    }
-    // 一文字子音が最後の子音の場合 [C]
-    else if (nonVowels.length >= 1) {
-        consonant = nonVowels[nonVowels.length - 1]; // 最後の一文字のみ残す
+        consonant = nonVowels.slice(-3).join('');
+    } else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
+        consonant = nonVowels.slice(-2).join('');
+    } else if (nonVowels.length >= 1) {
+        consonant = nonVowels[nonVowels.length - 1];
     }
 
-    // 子音削除が行われた場合のみ音調変更を適用
-    if (originalNonVowelsLength > 1 && nonVowels.length < originalNonVowelsLength) { // 変更点：削除されたか比較
+    // 子音の削除が行われたかどうかの判定 (キャプチャグループの比較)
+    if (originalConsonant !== consonant) {
         shouldApplyToneChange = true;
     }
 
-    if (shouldApplyToneChange) { // shouldApplyToneChangeがtrueの場合のみ適用
+    if (shouldApplyToneChange) {
         p1 = applyToneChange(p1, toneChange);
     }
 
