@@ -198,7 +198,7 @@ function transformWord(word) {
     word = modifiedWord;
 
     // 規則A: 子音連続の最初の子音に基づく声調変化 (追加)
-    const allConsonants = [
+    const allConsonantsA = [
         "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
         "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
         "s", "t", "v", "w", "x", "z", "'"
@@ -210,11 +210,11 @@ function transformWord(word) {
 
     do {
         word = modifiedWordForA;
-        modifiedWordForA = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonants.join('|')})+`, 'g'), (match, precedingVowel, consonantSequence) => {
+        modifiedWordForA = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonantsA.join('|')})+`, 'g'), (match, precedingVowel, consonantSequence) => {
             let firstConsonant = "";
             let toneChange = 0;
 
-            for (const consonant of allConsonants) {
+            for (const consonant of allConsonantsA) {
                 if (consonantSequence.startsWith(consonant)) {
                     firstConsonant = consonant;
                     break;
@@ -236,17 +236,17 @@ function transformWord(word) {
         word = modifiedWordForA;
 
 // 規則B
-const allConsonants = [
+const allConsonantsB = [
     "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-word = word.replace(new RegExp(`(${allConsonants.join('|')})+`, 'g'), (match) => {
+word = word.replace(new RegExp(`(${allConsonantsB.join('|')})+`, 'g'), (match) => {
     let lastConsonant = "";
     let tempMatch = match;
 
-    for (const consonant of allConsonants) {
+    for (const consonant of allConsonantsB) {
         if (tempMatch.endsWith(consonant)) {
             lastConsonant = consonant;
             break;
