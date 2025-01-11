@@ -141,92 +141,62 @@ function transformWord(word) {
     // 大文字を小文字に戻し、7と8を置換
     word = word.toLowerCase().replace(/7/g, "'").replace(/8/g, "’");
     
-const vowels = ['a', 'i', 'u', 'e', 'o', 'á', 'í', 'ú', 'é', 'ó'];
 const consonants = [
     "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
-function applyToneChange(vowel, toneChange) {
-    const accentedVowels = ['á', 'í', 'ú', 'é', 'ó'];
-    const baseVowels = ['a', 'i', 'u', 'e', 'o'];
-
-    const index = baseVowels.indexOf(vowel);
-    if (index !== -1) {
-      if(toneChange == 1) return accentedVowels[index];
-      else if(toneChange == 2) return baseVowels[index].toUpperCase()
-      else return vowel;
-    }
-    const accentedIndex = accentedVowels.indexOf(vowel);
-    if (accentedIndex !== -1) {
-        if(toneChange == 1) return accentedVowels[accentedIndex];
-        else if(toneChange == 2) return baseVowels[accentedIndex].toUpperCase();
-        else return vowel;
-    }
-    return vowel;
-}
-
 function processWord(word) {
     let processedWord = "";
-    let syllables = [];
 
-    // 音節分割 (簡易的な分割)
-    let currentSyllable = "";
-    for (let i = 0; i < word.length; i++) {
-        currentSyllable += word[i];
-        if (vowels.includes(word[i])) {
-            syllables.push(currentSyllable);
-            currentSyllable = "";
+    // 母音で区切られた部分を処理
+    const parts = word.split(new RegExp(`(${vowels.join('|')})`)).filter(Boolean);
+
+    for (let i = 0; i < parts.length; i += 2) {
+        let vowel = parts[i];
+        if(!vowels.includes(vowel)) continue;
+
+        let consonant = "";
+        if (parts[i + 1]) {
+            consonant = parts[i + 1];
         }
+
+        let toneChange = 0;
+        let shouldApplyToneChange = false;
+        const originalConsonant = consonant;
+        const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
+
+        if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
+            toneChange = 1;
+        } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
+            toneChange = 2;
+        } else if (/ghŭ|gh|ng|rŭ|sŭ|shŭ|zŭ/.test(consonant)) {
+            toneChange = 0;
+        } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
+            toneChange = 1;
+        } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
+            toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
+        }
+
+        if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
+            consonant = nonVowels.slice(-3).join('');
+        } else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
+            consonant = nonVowels.slice(-2).join('');
+        } else if (nonVowels.length >= 1) {
+            consonant = nonVowels[nonVowels.length - 1];
+        }
+
+        if (originalConsonant !== consonant) {
+            shouldApplyToneChange = true;
+        }
+
+        if (shouldApplyToneChange) {
+            vowel = applyToneChange(vowel, toneChange);
+        }
+
+        processedWord += vowel + consonant;
     }
-    if (currentSyllable) {
-        syllables.push(currentSyllable);
-    }
-    
-
-    syllables.forEach(syllable => {
-        const vowelPattern = new RegExp(`(${vowels.join('|')})([^${vowels.join('')}]+)(${vowels.join('|')})`);
-        syllable = syllable.replace(vowelPattern, (match, p1, consonant, p2) => {
-            let toneChange = 0;
-            let shouldApplyToneChange = false;
-
-            const originalConsonant = consonant;
-            const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
-            const originalNonVowelsLength = nonVowels.length;
-
-            if (/ch’|khŭ|phŭ|thŭ/.test(consonant)) {
-                toneChange = 1;
-            } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
-                toneChange = 2;
-            } else if (/ghŭ|gh|ng|rŭ|sŭ|shŭ|zŭ/.test(consonant)) {
-                toneChange = 0;
-            } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
-                toneChange = 1;
-            } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
-                toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
-            }
-
-            if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
-                consonant = nonVowels.slice(-3).join('');
-            } else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
-                consonant = nonVowels.slice(-2).join('');
-            } else if (nonVowels.length >= 1) {
-                consonant = nonVowels[nonVowels.length - 1];
-            }
-
-            if (originalConsonant !== consonant) {
-                shouldApplyToneChange = true;
-            }
-
-            if (shouldApplyToneChange) {
-                p1 = applyToneChange(p1, toneChange);
-            }
-
-            return `${p1}${consonant}${p2}`;
-        });
-        processedWord += syllable;
-    });
 
     return processedWord;
 }
