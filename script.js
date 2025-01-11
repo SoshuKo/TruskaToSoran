@@ -168,8 +168,10 @@ word = word.replace(vowelPattern, (match, p1, consonant, p2) => {
             toneChange = 0;
         } else if (/ch|c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
             toneChange = 1;
-        } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
-            toneChange = /b|d|g|j/.test(consonant) ? 2 : 1;
+        } else if (/b|d|g|j/.test(consonant)) {
+            toneChange = 2;
+        } else if (/'|c|k|p|t/.test(consonant)) {
+            toneChange = 1;
         }
 
         const originalNonVowelsLength = nonVowels.length
