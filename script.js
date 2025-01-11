@@ -161,7 +161,7 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
     // 変換されたp1とその後の母音p2を返す
     return `${p1}${consonant}${p2}`;
 });
-
+    
 // 規則③: 語尾変換
 const endingsWithToneChange = [
     { pattern: /'$/, replacement: '', toneChange: 1 },  // ' → 子音なし (声調変化1)
