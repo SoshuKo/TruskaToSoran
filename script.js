@@ -173,12 +173,12 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
     // D: 三文字子音が最後の子音以外であれば削除する
     if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
         consonant = nonVowels.slice(-3).join(''); // 最後の三文字を残す
-        shouldApplyToneChange = true;
+        shouldApplyToneChange = false;
     }
     // E: 二文字子音が最後の子音以外であれば削除する
     else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
         consonant = nonVowels.slice(-2).join(''); // 最後の二文字を残す
-        shouldApplyToneChange = true;
+        shouldApplyToneChange = false;
     }
     // 一文字子音が最後の子音の場合 [C]
     else if (nonVowels.length >= 1) {
