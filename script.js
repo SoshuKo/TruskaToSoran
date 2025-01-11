@@ -143,8 +143,8 @@ function transformWord(word) {
     
 // 規則②: 母音間の子音削除
 const consonants = [
-    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "hŭ", "k’", "kh", "ng", 
-    "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "h", "j", "k", "m", "n", "p", "r", 
+    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng", 
+    "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r", 
     "s", "t", "v", "w", "x", "z", "'"
 ];
 
@@ -171,12 +171,12 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
 
     // 三文字子音が最後の子音の場合のみ最後の三文字を残す [A]
-    if (nonVowels.length >= 3 && /chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
+    if (nonVowels.length >= 3 && /ch’|chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
         consonant = nonVowels.slice(-3).join(''); // 最後の三文字を残す
         shouldApplyToneChange = false;
     }
     // 二文字子音が最後の子音の場合のみ最後の二文字を残す [B]
-    else if (nonVowels.length >= 2 && /bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
+    else if (nonVowels.length >= 2 && /c’|k’|p’|t’|bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
         consonant = nonVowels.slice(-2).join(''); // 最後の二文字を残す
         shouldApplyToneChange = false;
     }
