@@ -169,7 +169,7 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
 
     // 二文字子音があるかどうかをチェックする
-    if (nonVowels.length === 2 && /gh|kh|ph|sh|th/.test(nonVowels.join(''))) {
+    if (nonVowels.length === 2 && /gh|kh|ng|ph|sh|th/.test(nonVowels.join(''))) {
         consonant = nonVowels.join(''); // 二文字子音をそのまま残す
         shouldApplyToneChange = false; // 子音削除が行われない場合は音調変更しない
     } else if (nonVowels.length > 1) {
