@@ -170,16 +170,20 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
 
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
 
-// 二文字子音または三文字子音があるかどうかをチェックする
-if (nonVowels.length === 3 && /chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(nonVowels.join(''))) {
-    consonant = nonVowels.join(''); // 三文字子音をそのまま残す
-    shouldApplyToneChange = false; // 子音削除が行われない場合は音調変更しない
-} else if (nonVowels.length === 2 && /bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(nonVowels.join(''))) {
-    consonant = nonVowels.join(''); // 二文字子音をそのまま残す
-    shouldApplyToneChange = false; // 子音削除が行われない場合は音調変更しない
-} else if (nonVowels.length > 1) {
-    consonant = nonVowels[nonVowels.length - 1]; // 最後の子音のみ残す
-}
+    // 三文字子音が最後の子音の場合のみ最後の三文字を残す [A]
+    if (nonVowels.length >= 3 && /chŭ|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
+        consonant = nonVowels.slice(-3).join(''); // 最後の三文字を残す
+        shouldApplyToneChange = false;
+    }
+    // 二文字子音が最後の子音の場合のみ最後の二文字を残す [B]
+    else if (nonVowels.length >= 2 && /bŭ|dŭ|gŭ|jŭ|rŭ|sŭ|zŭ|ch|gh|kh|ng|ph|sh|th/.test(consonant)) {
+        consonant = nonVowels.slice(-2).join(''); // 最後の二文字を残す
+        shouldApplyToneChange = false;
+    }
+    // 一文字子音が最後の子音の場合 [C]
+    else if (nonVowels.length >= 1) {
+        consonant = nonVowels[nonVowels.length - 1]; // 最後の一文字のみ残す
+    }
 
     // 子音削除が行われた場合のみ音調変更を適用
     if (shouldApplyToneChange && nonVowels.length > 1) {
