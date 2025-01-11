@@ -197,6 +197,45 @@ function transformWord(word) {
 
     word = modifiedWord;
 
+    // 規則A: 子音連続の最初の子音に基づく声調変化 (追加)
+    const allConsonants = [
+        "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
+        "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
+        "s", "t", "v", "w", "x", "z", "'"
+    ];
+
+    let modifiedWordForA = word;
+    let iterationsForA = 0;
+    const maxIterationsForA = 10;
+
+    do {
+        word = modifiedWordForA;
+        modifiedWordForA = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonants.join('|')})+`, 'g'), (match, precedingVowel, consonantSequence) => {
+            let firstConsonant = "";
+            let toneChange = 0;
+
+            for (const consonant of allConsonants) {
+                if (consonantSequence.startsWith(consonant)) {
+                    firstConsonant = consonant;
+                    break;
+                }
+            }
+
+            if (firstConsonant) {
+                if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
+                    toneChange = 1;
+                } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
+                    toneChange = 2;
+                }
+                precedingVowel = applyToneChange(precedingVowel, toneChange);
+            }
+            return `${precedingVowel}${consonantSequence}`;
+        });
+        iterationsForA++;
+    } while (modifiedWordForA !== word && iterationsForA < maxIterationsForA);
+        word = modifiedWordForA;
+
+// 規則B
 const allConsonants = [
     "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
