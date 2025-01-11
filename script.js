@@ -170,13 +170,16 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
 
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
 
-    // 二文字子音があるかどうかをチェックする
-    if (nonVowels.length === 2 && /ghŭ|gh|kh|ng|ph|sh|th/.test(nonVowels.join(''))) {
-        consonant = nonVowels.join(''); // 二文字子音をそのまま残す
-        shouldApplyToneChange = false; // 子音削除が行われない場合は音調変更しない
-    } else if (nonVowels.length > 1) {
-        consonant = nonVowels[nonVowels.length - 1]; // 最後の子音のみ残す
-    }
+// 二文字子音または三文字子音があるかどうかをチェックする
+if (nonVowels.length === 3 && /ghŭ/.test(nonVowels.join(''))) {
+    consonant = nonVowels.join(''); // 三文字子音をそのまま残す
+    shouldApplyToneChange = false; // 子音削除が行われない場合は音調変更しない
+} else if (nonVowels.length === 2 && /gh|kh|ng|ph|sh|th/.test(nonVowels.join(''))) {
+    consonant = nonVowels.join(''); // 二文字子音をそのまま残す
+    shouldApplyToneChange = false; // 子音削除が行われない場合は音調変更しない
+} else if (nonVowels.length > 1) {
+    consonant = nonVowels[nonVowels.length - 1]; // 最後の子音のみ残す
+}
 
     // 子音削除が行われた場合のみ音調変更を適用
     if (shouldApplyToneChange && nonVowels.length > 1) {
