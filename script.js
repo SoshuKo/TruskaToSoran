@@ -125,7 +125,7 @@ function transformWord(word) {
 const consonants = [
     "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "c’", "dŭ", "gŭ", "jŭ", "k’", "kh", "ng", 
     "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r", 
-    "s", "t", "v", "w", "x", "z"
+    "s", "t", "v", "w", "x", "z", "'"
 ];
 
 const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${vowels.join('|')})`, 'g');
