@@ -197,28 +197,31 @@ function transformWord(word) {
 
     word = modifiedWord;
 
-    // 規則A: 子音連続に基づく声調変化
-    const allConsonants = [
-        "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
-        "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
-        "s", "t", "v", "w", "x", "z", "'"
-    ];
+// 規則A: 子音連続に基づく声調変化
+const allConsonants = [
+    "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
+    "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
+    "s", "t", "v", "w", "x", "z", "'"
+];
 
-    const consonantPattern = new RegExp(`(${allConsonants.join('|')})+`, 'g');
-    word = word.replace(consonantPattern, (match, offset, string) => {
-        if (match.length <= 1) {
-            return match; // 子音が1つ以下なら何もしない
-        }
+const consonantPattern = new RegExp(`(${allConsonants.join('|')})+`, 'g');
 
-        const firstConsonant = match.match(new RegExp(allConsonants.join('|')))[0];
+word = word.replace(consonantPattern, (match, offset, string) => {
+    if (match.length <= 1) {
+        return match; // 子音が1つ以下なら何もしない
+    }
 
-        let toneChange = 0;
-        if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
-            toneChange = 1;
-        } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
-            toneChange = 2;
-        }
+    const firstConsonant = match.match(new RegExp(allConsonants.join('|')))[0];
 
+    let toneChange = 0;
+    if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
+        toneChange = 1;
+    } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
+        toneChange = 2;
+    }
+
+    // ★修正点: offsetが0の場合の処理を追加
+    if (offset > 0) { // offsetが0より大きい場合のみcharAtを実行
         const precedingChar = string.charAt(offset - 1);
         if (vowels.includes(precedingChar)) {
             const modifiedVowel = applyToneChange(precedingChar, toneChange);
@@ -226,7 +229,10 @@ function transformWord(word) {
         } else {
             return match;
         }
-    });
+    } else {
+        return match; // offsetが0の場合は変更せずに返す
+    }
+});
 
 // 規則B
 const allConsonantsB = [
