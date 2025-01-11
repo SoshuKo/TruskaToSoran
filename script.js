@@ -160,6 +160,8 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         toneChange = 1;
     } else if (/bŭ|dŭ|gŭ|jŭ/.test(consonant)) {
         toneChange = 2;
+    } else if (/gh|ng/.test(consonant)) {
+        toneChange = 0;
     } else if (/c’|k’|p’|t’|kh|ph|th/.test(consonant)) {
         toneChange = 1;
     } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
