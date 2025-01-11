@@ -1,3 +1,27 @@
+function transformWord(word) {
+    // 改行やスペースで単語を分割して処理
+    const splitWords = word.split(/(\s|\n)/);  // スペースまたは改行で分割
+    
+    let result = splitWords.map(segment => {
+        // スペースや改行を除外した単語にのみ変換処理を適用
+        if (segment.trim() !== '') {
+            return applyTransformations(segment);  // 各単語に対する処理関数を呼び出し
+        }
+        return segment;  // スペースや改行はそのまま
+    }).join('');  // 変換後の単語を再結合
+    
+    return result;
+}
+
+function applyTransformations(word) {
+    // 既存の規則に基づく変換処理
+    patterns.forEach(({ pattern, replacement }) => {
+        word = word.replace(pattern, replacement);
+    });
+    // 追加の変換処理
+    return word;
+}
+
 const vowels = ["ĭā", "ā", "ī", "ȳ", "ū", "ĭū", "ĭē", "ē", "ō", "ĭō", "a", "e", "i", "o", "u", "y", "üa", "üā", "üē", "üō"];
 
 function convertSentence(sentence) {
