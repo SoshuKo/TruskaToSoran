@@ -197,43 +197,36 @@ function transformWord(word) {
 
     word = modifiedWord;
 
-    // 規則A: 子音連続の最初の子音に基づく声調変化 (追加)
-    const allConsonantsA = [
+    // 規則A: 子音連続に基づく声調変化
+    const allConsonants = [
         "ch’", "ghŭ", "khŭ", "phŭ", "shŭ", "thŭ", "bŭ", "ch", "c’", "dŭ", "gh", "gŭ", "jŭ", "k’", "kh", "ng",
         "p’", "ph", "rŭ", "sh", "sŭ", "t’", "th", "zŭ", "b", "c", "d", "f", "g", "j", "k", "m", "n", "p", "r",
         "s", "t", "v", "w", "x", "z", "'"
     ];
 
-    let modifiedWordForA = word;
-    let iterationsForA = 0;
-    const maxIterationsForA = 10;
+    const consonantPattern = new RegExp(`(${allConsonants.join('|')})+`, 'g');
+    word = word.replace(consonantPattern, (match, offset, string) => {
+        if (match.length <= 1) {
+            return match; // 子音が1つ以下なら何もしない
+        }
 
-    do {
-        word = modifiedWordForA;
-        modifiedWordForA = word.replace(new RegExp(`(${vowels.join('|')})(${allConsonantsA.join('|')})+`, 'g'), (match, precedingVowel, consonantSequence) => {
-            let firstConsonant = "";
-            let toneChange = 0;
+        const firstConsonant = match.match(new RegExp(allConsonants.join('|')))[0];
 
-            for (const consonant of allConsonantsA) {
-                if (consonantSequence.startsWith(consonant)) {
-                    firstConsonant = consonant;
-                    break;
-                }
-            }
+        let toneChange = 0;
+        if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
+            toneChange = 1;
+        } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
+            toneChange = 2;
+        }
 
-            if (firstConsonant) {
-                if (/ch’|khŭ|phŭ|thŭ|ch|c’|k’|p’|t’|kh|ph|th|'|c|k|p|t/.test(firstConsonant)) {
-                    toneChange = 1;
-                } else if (/bŭ|dŭ|gŭ|jŭ|b|d|g|j/.test(firstConsonant)) {
-                    toneChange = 2;
-                }
-                precedingVowel = applyToneChange(precedingVowel, toneChange);
-            }
-            return `${precedingVowel}${consonantSequence}`;
-        });
-        iterationsForA++;
-    } while (modifiedWordForA !== word && iterationsForA < maxIterationsForA);
-        word = modifiedWordForA;
+        const precedingChar = string.charAt(offset - 1);
+        if (vowels.includes(precedingChar)) {
+            const modifiedVowel = applyToneChange(precedingChar, toneChange);
+            return string.substring(0, offset - 1) + modifiedVowel + match + string.substring(offset + match.length);
+        } else {
+            return match;
+        }
+    });
 
 // 規則B
 const allConsonantsB = [
