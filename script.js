@@ -133,21 +133,17 @@ const vowelPattern = new RegExp(`(${vowels.join('|')})[^${vowels.join('')}]+(${v
 word = word.replace(vowelPattern, (match, p1, p2) => {
     let consonant = match.slice(p1.length, match.length - p2.length);
     let toneChange = 0;
-    let shouldApplyToneChange = false;
+    let shouldApplyToneChange = true;
 
-    // 2文字子音の処理: kh, ph, sh, th は削除せずそのまま残す
+    // 特定の子音を削除しない場合でも音調変更しないようにする
     if (/ch’|ghŭ|khŭ|phŭ|shŭ|thŭ/.test(consonant)) {
         toneChange = 1;
-        shouldApplyToneChange = true;
     } else if (/bŭ|c’|dŭ|gŭ|jŭ|k’|kh|p’|ph|t’|th/.test(consonant)) {
         toneChange = 2;
-        shouldApplyToneChange = true;
     } else if (/'|b|c|d|g|j|k|p|t/.test(consonant)) {
         toneChange = 1;
-        shouldApplyToneChange = true;
     }
 
-    // 母音リストを使って、非母音文字を取得
     const nonVowels = consonant.split('').filter(char => !vowels.includes(char));
 
     // 2つ以上の子音が連続している場合のみ、最後の子音以外を削除
@@ -155,16 +151,15 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         consonant = nonVowels[nonVowels.length - 1]; // 最後の子音のみ残す
     } else if (nonVowels.length === 1 && /ch|kh|ph|sh|th/.test(nonVowels[0])) {
         consonant = nonVowels.join('');
-        toneChange = 0;  // 追加: これらの子音は音調変更しない
-        shouldApplyToneChange = false;  // これらの子音は音調変更しない
+        toneChange = 0;
+        shouldApplyToneChange = false; // 子音削除が行われない場合は音調変更しない
     }
 
     // 子音削除が行われた場合のみ音調変更を適用
-    if (shouldApplyToneChange) {
+    if (shouldApplyToneChange && nonVowels.length > 1) {
         p1 = applyToneChange(p1, toneChange);
     }
 
-    // 変換されたp1とその後の母音p2を返す
     return `${p1}${consonant}${p2}`;
 });
     
