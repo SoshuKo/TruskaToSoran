@@ -190,7 +190,7 @@ word = word.replace(vowelPattern, (match, p1, p2) => {
         p1 = applyToneChange(p1, toneChange);
     }
 
-    return ${p1}${consonant}${p2};
+    return `${p1}${consonant}${p2}`;
 });
     
 // 規則③: 語尾変換
